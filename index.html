@@ -4183,6 +4183,21 @@
       }
     }
   </style>
+  <style>
+    /* Keep the upper banner artwork visible on desktop */
+    @media (min-width: 1051px) {
+      .top-video {
+        min-height: 142px !important;
+        max-height: 190px !important;
+        aspect-ratio: 24 / 4.6 !important;
+      }
+
+      .top-video video {
+        object-fit: cover !important;
+        object-position: center top !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <main class="wrap">
