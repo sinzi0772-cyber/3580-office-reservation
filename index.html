@@ -3916,6 +3916,16 @@
   </style>
   <style>
     /* Mobile header and natural-ratio banner */
+    #slotList .slot.is-open .booking-status .dot {
+      color: #87ad7a !important;
+      background: #87ad7a !important;
+    }
+
+    #slotList .slot.is-booked .booking-status .dot {
+      color: #d47d76 !important;
+      background: #d47d76 !important;
+    }
+
     @media (max-width: 1050px) {
       .top {
         width: 100% !important;
@@ -4195,14 +4205,62 @@
       }
     };
 
-    /* Verified interface translations.
-       WOS office and buff names intentionally remain in English to avoid
-       mismatches between regional game clients. */
-    const sharedOffices = {
-      "no-buff": ["Vice President", "No Buff"],
-      "mercantilism": ["Vice President", "Construction Buff"],
-      "mobilize": ["Minister of Education", "Education Buff"],
-      "research-advancement": ["Vice President", "Research Buff"]
+    /* Localized WOS office and buff terminology. */
+    const localizedOffices = {
+      ko: {
+        "no-buff": ["부집행관", "버프 없음"],
+        "mercantilism": ["부집행관", "건설 버프"],
+        "mobilize": ["교육부 장관", "교육 버프"],
+        "research-advancement": ["부집행관", "연구 버프"]
+      },
+      en: {
+        "no-buff": ["Vice President", "No Buff"],
+        "mercantilism": ["Vice President", "Construction Buff"],
+        "mobilize": ["Minister of Education", "Education Buff"],
+        "research-advancement": ["Vice President", "Research Buff"]
+      },
+      ja: {
+        "no-buff": ["副執政官", "バフなし"],
+        "mercantilism": ["副執政官", "建造バフ"],
+        "mobilize": ["教育部長", "教育バフ"],
+        "research-advancement": ["副執政官", "研究バフ"]
+      },
+      "zh-Hans": {
+        "no-buff": ["副执政官", "无增益"],
+        "mercantilism": ["副执政官", "建造增益"],
+        "mobilize": ["教育部长", "教育增益"],
+        "research-advancement": ["副执政官", "研究增益"]
+      },
+      "zh-Hant": {
+        "no-buff": ["副執政官", "無增益"],
+        "mercantilism": ["副執政官", "建造增益"],
+        "mobilize": ["教育部長", "教育增益"],
+        "research-advancement": ["副執政官", "研究增益"]
+      },
+      es: {
+        "no-buff": ["Vicepresidente", "Sin bonificación"],
+        "mercantilism": ["Vicepresidente", "Bonificación de construcción"],
+        "mobilize": ["Ministro de Educación", "Bonificación de educación"],
+        "research-advancement": ["Vicepresidente", "Bonificación de investigación"]
+      },
+      pt: {
+        "no-buff": ["Vice-Presidente", "Sem bônus"],
+        "mercantilism": ["Vice-Presidente", "Bônus de construção"],
+        "mobilize": ["Ministro da Educação", "Bônus de educação"],
+        "research-advancement": ["Vice-Presidente", "Bônus de pesquisa"]
+      },
+      fr: {
+        "no-buff": ["Vice-président", "Aucun bonus"],
+        "mercantilism": ["Vice-président", "Bonus de construction"],
+        "mobilize": ["Ministre de l’Éducation", "Bonus d’éducation"],
+        "research-advancement": ["Vice-président", "Bonus de recherche"]
+      },
+      de: {
+        "no-buff": ["Vizepräsident", "Kein Bonus"],
+        "mercantilism": ["Vizepräsident", "Baubonus"],
+        "mobilize": ["Bildungsminister", "Bildungsbonus"],
+        "research-advancement": ["Vizepräsident", "Forschungsbonus"]
+      }
     };
 
     Object.assign(i18n, {
@@ -4220,7 +4278,7 @@
         clearConfirm: "현재 관직의 모든 예약을 삭제할까요?",
         cleared: "현재 관직의 예약이 삭제되었습니다.",
         days: { mon: "월요일", tue: "화요일", thu: "목요일", fri: "금요일" },
-        offices: sharedOffices
+        offices: localizedOffices.ko
       },
       en: {
         title: "Office Reservation", credit: "Created by", admin: "Admin Password",
@@ -4236,7 +4294,7 @@
         clearConfirm: "Clear all reservations for the current office?",
         cleared: "Reservations for the current office were cleared.",
         days: { mon: "Monday", tue: "Tuesday", thu: "Thursday", fri: "Friday" },
-        offices: sharedOffices
+        offices: localizedOffices.en
       },
       ja: {
         title: "官職予約", credit: "制作", admin: "管理者パスワード",
@@ -4252,7 +4310,7 @@
         clearConfirm: "現在の官職の予約をすべて削除しますか？",
         cleared: "現在の官職の予約を削除しました。",
         days: { mon: "月曜日", tue: "火曜日", thu: "木曜日", fri: "金曜日" },
-        offices: sharedOffices
+        offices: localizedOffices.ja
       },
       "zh-Hans": {
         title: "官职预约", credit: "制作", admin: "管理员密码",
@@ -4268,7 +4326,7 @@
         clearConfirm: "是否清除当前官职的全部预约？",
         cleared: "当前官职的预约已清除。",
         days: { mon: "星期一", tue: "星期二", thu: "星期四", fri: "星期五" },
-        offices: sharedOffices
+        offices: localizedOffices["zh-Hans"]
       },
       "zh-Hant": {
         title: "官職預約", credit: "製作", admin: "管理員密碼",
@@ -4284,7 +4342,7 @@
         clearConfirm: "是否清除目前官職的全部預約？",
         cleared: "目前官職的預約已清除。",
         days: { mon: "星期一", tue: "星期二", thu: "星期四", fri: "星期五" },
-        offices: sharedOffices
+        offices: localizedOffices["zh-Hant"]
       },
       es: {
         title: "Reserva de cargos", credit: "Creado por", admin: "Contraseña de administrador",
@@ -4300,7 +4358,7 @@
         clearConfirm: "¿Borrar todas las reservas del cargo actual?",
         cleared: "Se borraron las reservas del cargo actual.",
         days: { mon: "Lunes", tue: "Martes", thu: "Jueves", fri: "Viernes" },
-        offices: sharedOffices
+        offices: localizedOffices.es
       },
       pt: {
         title: "Reserva de cargos", credit: "Criado por", admin: "Senha de administrador",
@@ -4316,7 +4374,7 @@
         clearConfirm: "Limpar todas as reservas do cargo atual?",
         cleared: "As reservas do cargo atual foram removidas.",
         days: { mon: "Segunda-feira", tue: "Terça-feira", thu: "Quinta-feira", fri: "Sexta-feira" },
-        offices: sharedOffices
+        offices: localizedOffices.pt
       },
       fr: {
         title: "Réservation de postes", credit: "Créé par", admin: "Mot de passe administrateur",
@@ -4332,7 +4390,7 @@
         clearConfirm: "Effacer toutes les réservations du poste actuel ?",
         cleared: "Les réservations du poste actuel ont été effacées.",
         days: { mon: "Lundi", tue: "Mardi", thu: "Jeudi", fri: "Vendredi" },
-        offices: sharedOffices
+        offices: localizedOffices.fr
       },
       de: {
         title: "Ämterreservierung", credit: "Erstellt von", admin: "Admin-Passwort",
@@ -4348,7 +4406,7 @@
         clearConfirm: "Alle Reservierungen für das aktuelle Amt löschen?",
         cleared: "Die Reservierungen für das aktuelle Amt wurden gelöscht.",
         days: { mon: "Montag", tue: "Dienstag", thu: "Donnerstag", fri: "Freitag" },
-        offices: sharedOffices
+        offices: localizedOffices.de
       }
     });
 
