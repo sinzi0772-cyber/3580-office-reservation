@@ -4133,7 +4133,53 @@
 
     @media (max-width: 1050px) {
       .top-actions .credit {
-        max-width: 360px !important;
+        width: 100% !important;
+        max-width: none !important;
+        padding: 17px 16px 15px 20px !important;
+        border-color: rgba(223, 195, 128, .68) !important;
+        box-shadow:
+          inset 4px 0 0 #cfb77f,
+          inset 0 1px 0 rgba(255, 255, 255, .05),
+          0 16px 36px rgba(0, 0, 0, .34) !important;
+      }
+
+      .top-actions .credit-main {
+        grid-template-columns: minmax(88px, .55fr) minmax(180px, 1.45fr) !important;
+        align-items: center !important;
+        gap: 10px 18px !important;
+      }
+
+      .top-actions #creditText {
+        align-self: start !important;
+        padding-top: 4px !important;
+      }
+
+      .top-actions .credit-name > strong {
+        font-size: 19px !important;
+      }
+
+      .creator-location {
+        grid-template-columns: auto auto 1fr !important;
+        justify-content: start !important;
+      }
+
+      .creator-heart {
+        justify-self: start !important;
+      }
+
+      .creator-invite {
+        grid-column: 2 !important;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .top-actions .credit-main {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+      }
+
+      .creator-invite {
+        grid-column: 1 !important;
       }
     }
   </style>
@@ -4166,7 +4212,7 @@
                 <span>X:567 Y:734</span>
                 <span class="creator-heart" aria-label="Find KOR YURI at these coordinates and send a heart">♡ +1</span>
               </span>
-              <span class="creator-invite">Find me · Tap the heart</span>
+              <span class="creator-invite" id="creatorInvite">Find me · Tap the heart</span>
             </span>
           </div>
         </div>
@@ -4180,6 +4226,7 @@
           <option value="pt">Português</option>
           <option value="fr">Français</option>
           <option value="de">Deutsch</option>
+          <option value="tr">Türkçe</option>
         </select>
         <button class="admin" id="adminBtn" type="button">Admin Password</button>
       </div>
@@ -4423,6 +4470,12 @@
         "mercantilism": ["Vizepräsident", "Baubonus"],
         "mobilize": ["Bildungsminister", "Bildungsbonus"],
         "research-advancement": ["Vizepräsident", "Forschungsbonus"]
+      },
+      tr: {
+        "no-buff": ["Başkan Yardımcısı", "Bonus Yok"],
+        "mercantilism": ["Başkan Yardımcısı", "İnşaat Bonusu"],
+        "mobilize": ["Eğitim Bakanı", "Eğitim Bonusu"],
+        "research-advancement": ["Başkan Yardımcısı", "Araştırma Bonusu"]
       }
     };
 
@@ -4570,6 +4623,23 @@
         cleared: "Die Reservierungen für das aktuelle Amt wurden gelöscht.",
         days: { mon: "Montag", tue: "Dienstag", thu: "Donnerstag", fri: "Freitag" },
         offices: localizedOffices.de
+      },
+      tr: {
+        title: "Makam Rezervasyonu", credit: "Oluşturan", admin: "Yönetici Şifresi",
+        adminOn: "Yönetici Modu AÇIK", clear: "Geçerli Makamın Rezervasyonlarını Temizle",
+        reserve: "Rezerve Et", reserved: "Rezerve Edildi", available: "Müsait",
+        edit: "Düzenle", delete: "Sil", alliance: "İttifak", name: "İsim", id: "ID",
+        cancel: "İptal", save: "Kaydet", login: "Giriş Yap",
+        adminLogin: "Yönetici Girişi", adminHelp: "Yönetici şifresini girin.",
+        password: "Şifre", adminOnMsg: "Yönetici modu açıldı.",
+        adminOffMsg: "Yönetici modu kapatıldı.", wrongPassword: "Şifre hatalı.",
+        saved: "Rezervasyon kaydedildi.", deleted: "Rezervasyon silindi.",
+        adminOnlyEdit: "Rezerve edilmiş zaman dilimlerini yalnızca yöneticiler düzenleyebilir.",
+        clearConfirm: "Geçerli makama ait tüm rezervasyonlar temizlensin mi?",
+        cleared: "Geçerli makama ait rezervasyonlar temizlendi.",
+        creatorInvite: "Beni bul · Kalbe dokun",
+        days: { mon: "Pazartesi", tue: "Salı", thu: "Perşembe", fri: "Cuma" },
+        offices: localizedOffices.tr
       }
     });
 
@@ -4870,13 +4940,14 @@
     function renderStaticText() {
       const documentLanguages = {
         en: "en", ko: "ko", ja: "ja", "zh-Hans": "zh-CN",
-        "zh-Hant": "zh-TW", es: "es", pt: "pt-BR", fr: "fr", de: "de"
+        "zh-Hant": "zh-TW", es: "es", pt: "pt-BR", fr: "fr", de: "de", tr: "tr"
       };
       document.documentElement.lang = documentLanguages[currentLang] || "en";
       document.title = `Whiteout Survival ${t("title")}`;
       langSelect.value = currentLang;
       document.querySelector("#appTitle").textContent = t("title");
       document.querySelector("#creditText").textContent = t("credit");
+      document.querySelector("#creatorInvite").textContent = i18n[currentLang].creatorInvite || "Find me · Tap the heart";
       document.querySelector("#clearBtn").textContent = t("clear");
       document.querySelector("#allianceLabel").textContent = t("alliance");
       document.querySelector("#nameLabel").textContent = t("name");
