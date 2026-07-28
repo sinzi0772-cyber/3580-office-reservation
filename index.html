@@ -3914,6 +3914,64 @@
       white-space: nowrap !important;
     }
   </style>
+  <style>
+    /* Mobile header and natural-ratio banner */
+    @media (max-width: 1050px) {
+      .top {
+        width: 100% !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto auto !important;
+        justify-items: stretch !important;
+      }
+
+      .top > * {
+        min-width: 0 !important;
+        max-width: none !important;
+      }
+
+      .brand {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+      }
+
+      .top-video {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: 16 / 9 !important;
+      }
+
+      .top-video video {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        object-fit: cover !important;
+        object-position: center !important;
+      }
+
+      .top-actions {
+        grid-column: 1 !important;
+        grid-row: 3 !important;
+        width: 100% !important;
+        justify-self: stretch !important;
+      }
+
+      .board {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .banner-entry {
+        min-width: 0 !important;
+        max-width: calc(100% - 28px) !important;
+        padding: 9px 13px !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <main class="wrap">
@@ -4609,8 +4667,8 @@
       document.querySelector("#adminLoginTitle").textContent = t("adminLogin");
       document.querySelector("#adminLoginHelp").textContent = t("adminHelp");
       document.querySelector("#passwordLabel").textContent = t("password");
-      document.querySelector("#alliance").placeholder = "e.g. KOR";
-      document.querySelector("#player").placeholder = "e.g. YURI";
+      document.querySelector("#alliance").placeholder = "KOR";
+      document.querySelector("#player").placeholder = "YURI";
       document.querySelector("#adminBtn").textContent = adminMode ? t("adminOn") : t("admin");
     }
 
