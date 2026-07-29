@@ -4228,7 +4228,7 @@
         grid-template-columns: minmax(120px, 42%) minmax(0, 58%) !important;
         align-items: stretch !important;
         padding: 0 !important;
-        min-height: 190px !important;
+        min-height: 132px !important;
       }
 
       .creator-media {
@@ -4236,11 +4236,13 @@
         grid-column: 1 !important;
         width: 100% !important;
         height: 100% !important;
-        min-height: 190px !important;
-        object-fit: cover !important;
-        object-position: 31% center !important;
+        min-height: 132px !important;
+        object-fit: contain !important;
+        object-position: center center !important;
+        padding: 5px !important;
+        background: #050605 !important;
         border-right: 1px solid rgba(207, 183, 127, .24) !important;
-        filter: saturate(.72) contrast(1.06) brightness(.62) !important;
+        filter: saturate(.82) contrast(1.04) brightness(.78) !important;
       }
 
       .top-actions .credit-main {
@@ -4248,8 +4250,8 @@
         grid-template-columns: 1fr !important;
         align-content: center !important;
         justify-items: end !important;
-        gap: 10px !important;
-        padding: 18px 18px 16px 14px !important;
+        gap: 6px !important;
+        padding: 11px 16px 10px 12px !important;
       }
 
       .top-actions .credit-name,
@@ -4322,7 +4324,7 @@
       </section>
       <div class="top-actions">
         <div class="credit">
-          <video class="creator-media" src="reservation-banner-20260728-compressed.mp4" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <img class="creator-media" src="kor-leader-yuri.png" alt="KOR Leader Yuri">
           <div class="credit-main">
             <span id="creditText">Created by</span>
             <span class="credit-name">
