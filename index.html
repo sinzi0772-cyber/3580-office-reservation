@@ -4184,17 +4184,64 @@
     }
   </style>
   <style>
-    /* Keep the upper banner artwork visible on desktop */
+    /* Balanced cinematic framing for desktop and full framing for mobile */
     @media (min-width: 1051px) {
       .top-video {
-        min-height: 142px !important;
-        max-height: 190px !important;
-        aspect-ratio: 24 / 4.6 !important;
+        min-height: 210px !important;
+        max-height: 300px !important;
+        aspect-ratio: 24 / 7 !important;
       }
 
       .top-video video {
         object-fit: cover !important;
-        object-position: center top !important;
+        object-position: center center !important;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .top-video {
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: 16 / 9 !important;
+      }
+
+      .top-video video {
+        object-fit: contain !important;
+        object-position: center center !important;
+      }
+    }
+
+    .top-video video:fullscreen,
+    .top-video video:-webkit-full-screen {
+      object-fit: contain !important;
+      object-position: center center !important;
+      background: #000 !important;
+    }
+
+    @media (max-width: 1050px) {
+      .top-actions .credit,
+      .top-actions .credit-main,
+      .top-actions .credit-name,
+      .top-actions #creditText,
+      .creator-invite {
+        text-align: right !important;
+      }
+
+      .top-actions #creditText {
+        justify-self: end !important;
+      }
+
+      .creator-location {
+        grid-template-columns: auto auto auto !important;
+        justify-content: end !important;
+      }
+
+      .creator-heart {
+        justify-self: end !important;
+      }
+
+      .creator-invite {
+        grid-column: 1 / -1 !important;
       }
     }
   </style>
