@@ -4304,6 +4304,248 @@
       }
     }
   </style>
+  <style>
+    /* Universal language control and hidden creator-card admin entry */
+    .language-control {
+      display: grid;
+      width: 100%;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid rgba(207, 183, 127, .42);
+      border-radius: 9px;
+      background: linear-gradient(145deg, rgba(207, 183, 127, .09), rgba(10, 11, 10, .96));
+      cursor: pointer;
+    }
+
+    .language-control-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #cfb77f;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .language-control-icon {
+      font-size: 14px;
+      line-height: 1;
+      filter: grayscale(.15);
+    }
+
+    .language-control-native {
+      color: #a9a294;
+      font-weight: 650;
+      letter-spacing: .04em;
+      text-transform: none;
+    }
+
+    .language-control .lang-select {
+      min-height: 34px !important;
+      border-color: rgba(207, 183, 127, .32) !important;
+      color: #eee8dc !important;
+      background-color: #0c0e0c !important;
+      font-size: 10px !important;
+      font-weight: 650 !important;
+    }
+
+    .top-actions .admin.admin-trigger-proxy {
+      display: none !important;
+    }
+
+    .creator-admin-trigger {
+      cursor: pointer;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+
+    .creator-admin-trigger:hover,
+    .creator-admin-trigger:focus-visible {
+      border-color: rgba(223, 195, 128, .85) !important;
+      box-shadow:
+        inset 3px 0 0 #cfb77f,
+        inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 16px 38px rgba(0, 0, 0, .42),
+        0 0 0 2px rgba(207, 183, 127, .12) !important;
+      outline: none;
+    }
+
+    .creator-admin-trigger:active {
+      transform: translateY(1px);
+    }
+
+    @media (max-width: 1050px) {
+      .language-control {
+        padding: 10px;
+      }
+
+      .language-control-title {
+        justify-content: flex-start;
+        font-size: 10px;
+      }
+
+      .language-control .lang-select {
+        min-height: 42px !important;
+        font-size: 12px !important;
+      }
+    }
+  </style>
+  <style>
+    /* Applied creator background and uniform 30-minute slot cards */
+    .top-actions .credit.creator-admin-trigger {
+      display: block !important;
+      min-height: 142px !important;
+      padding: 0 !important;
+      border-radius: 12px !important;
+      background-image:
+        linear-gradient(90deg, #090a08 0%, rgba(9, 10, 8, .96) 33%, rgba(9, 10, 8, .72) 58%, rgba(9, 10, 8, .12) 100%),
+        url("kor-leader-yuri.png") !important;
+      background-position: center, right center !important;
+      background-repeat: no-repeat !important;
+      background-size: 100% 100%, auto 100% !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger::after {
+      z-index: 0 !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger .creator-media {
+      display: none !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger .credit-main {
+      position: relative !important;
+      z-index: 2 !important;
+      display: grid !important;
+      width: 68% !important;
+      min-height: 142px !important;
+      align-content: center !important;
+      justify-items: start !important;
+      gap: 8px !important;
+      padding: 15px 8px 14px 15px !important;
+      text-align: left !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger #creditText,
+    .top-actions .credit.creator-admin-trigger .credit-name,
+    .top-actions .credit.creator-admin-trigger .creator-invite {
+      width: 100% !important;
+      text-align: left !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger .credit-name {
+      justify-items: start !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger .creator-location {
+      grid-template-columns: auto auto !important;
+      justify-content: start !important;
+      gap: 7px !important;
+    }
+
+    .top-actions .credit.creator-admin-trigger .creator-heart {
+      grid-column: 1 / -1 !important;
+      justify-self: start !important;
+    }
+
+    #slotList .day-slots {
+      gap: 14px !important;
+      padding: 14px !important;
+      background: #090a0b !important;
+    }
+
+    #slotList .slot,
+    #slotList .slot.is-open,
+    #slotList .slot.is-booked {
+      box-sizing: border-box !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(184, 154, 90, .58) !important;
+      border-left: 1px solid rgba(184, 154, 90, .58) !important;
+      border-radius: 12px !important;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .018), transparent 58%),
+        #101213 !important;
+      box-shadow:
+        0 10px 24px rgba(0, 0, 0, .30),
+        inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+    }
+
+    #slotList .slot::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 10px auto 10px 7px !important;
+      width: 4px !important;
+      height: auto !important;
+      border-radius: 999px !important;
+      background: #87ad7a !important;
+      box-shadow: 0 0 16px rgba(135, 173, 122, .2) !important;
+    }
+
+    #slotList .slot.is-booked::before {
+      background: #d47d76 !important;
+      box-shadow: 0 0 16px rgba(212, 125, 118, .2) !important;
+    }
+
+    #slotList .slot.is-booked {
+      border-color: rgba(184, 154, 90, .58) !important;
+      background:
+        linear-gradient(145deg, rgba(212, 125, 118, .045), transparent 54%),
+        #111211 !important;
+    }
+
+    #slotList .slot:hover,
+    #slotList .slot.is-open:hover,
+    #slotList .slot.is-booked:hover {
+      border-color: rgba(207, 183, 127, .82) !important;
+      background-color: #141617 !important;
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, .38),
+        0 0 0 1px rgba(207, 183, 127, .08) !important;
+    }
+
+    @media (min-width: 1051px) {
+      .top {
+        grid-template-columns: minmax(190px, 20fr) minmax(560px, 64fr) minmax(210px, 16fr) !important;
+      }
+
+      .top-actions {
+        width: 210px !important;
+      }
+    }
+
+    @media (max-width: 1050px) {
+      .top-actions .credit.creator-admin-trigger {
+        width: 100% !important;
+        min-height: 168px !important;
+      }
+
+      .top-actions .credit.creator-admin-trigger .credit-main {
+        width: 62% !important;
+        min-height: 168px !important;
+        padding: 18px 12px 17px 19px !important;
+      }
+    }
+
+    @media (max-width: 560px) {
+      #slotList .day-slots {
+        gap: 12px !important;
+        padding: 12px !important;
+      }
+
+      #slotList .slot,
+      #slotList .slot.is-open,
+      #slotList .slot.is-booked {
+        padding: 18px 18px 18px 22px !important;
+      }
+
+      .top-actions .credit.creator-admin-trigger .credit-main {
+        width: 66% !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <main class="wrap">
@@ -4323,7 +4565,7 @@
         </button>
       </section>
       <div class="top-actions">
-        <div class="credit">
+        <div class="credit creator-admin-trigger" id="creatorAdminTrigger" role="button" tabindex="0" aria-label="KOR YURI creator card">
           <img class="creator-media" src="kor-leader-yuri.png" alt="KOR Leader Yuri">
           <div class="credit-main">
             <span id="creditText">Created by</span>
@@ -4338,19 +4580,26 @@
             </span>
           </div>
         </div>
-        <select class="lang-select" id="langSelect" aria-label="Language">
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="ja">日本語</option>
-          <option value="zh-Hans">简体中文</option>
-          <option value="zh-Hant">繁體中文</option>
-          <option value="es">Español</option>
-          <option value="pt">Português</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="tr">Türkçe</option>
-        </select>
-        <button class="admin" id="adminBtn" type="button">Admin Password</button>
+        <label class="language-control" for="langSelect">
+          <span class="language-control-title">
+            <span class="language-control-icon" aria-hidden="true">🌐</span>
+            <span>Language</span>
+            <span class="language-control-native">/ 언어</span>
+          </span>
+          <select class="lang-select" id="langSelect" aria-label="Choose language / 언어 선택">
+            <option value="en">English</option>
+            <option value="ko">한국어</option>
+            <option value="ja">日本語</option>
+            <option value="zh-Hans">简体中文</option>
+            <option value="zh-Hant">繁體中文</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="tr">Türkçe</option>
+          </select>
+        </label>
+        <button class="admin admin-trigger-proxy" id="adminBtn" type="button" hidden tabindex="-1" aria-hidden="true">Admin Password</button>
       </div>
     </header>
 
@@ -5206,6 +5455,17 @@
       adminPassword.value = "";
       adminDialog.showModal();
       adminPassword.focus();
+    });
+
+    const creatorAdminTrigger = document.querySelector("#creatorAdminTrigger");
+    creatorAdminTrigger.addEventListener("click", () => {
+      document.querySelector("#adminBtn").click();
+    });
+
+    creatorAdminTrigger.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      document.querySelector("#adminBtn").click();
     });
 
     const bannerVideo = document.querySelector("#bannerVideo");
