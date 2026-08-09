@@ -4851,7 +4851,7 @@
         offices: {
           "no-buff": ["Vice President", "No Buff"],
           "mercantilism": ["Vice President", "Construction Buff"],
-          "mobilize": ["Minister of Education", "Education Buff"],
+          "mobilize": ["Minister of Education", "Train Troops Buff"],
           "research-advancement": ["Vice President", "Research Buff"]
         }
       },
@@ -4887,7 +4887,7 @@
         offices: {
           "no-buff": ["Vice President", "No Buff"],
           "mercantilism": ["Vice President", "Construction Buff"],
-          "mobilize": ["Minister of Education", "Education Buff"],
+          "mobilize": ["Minister of Education", "Train Troops Buff"],
           "research-advancement": ["Vice President", "Research Buff"]
         }
       },
@@ -4923,7 +4923,7 @@
         offices: {
           "no-buff": ["Vice President", "No Buff"],
           "mercantilism": ["Vice President", "Construction Buff"],
-          "mobilize": ["Minister of Education", "Education Buff"],
+          "mobilize": ["Minister of Education", "Train Troops Buff"],
           "research-advancement": ["Vice President", "Research Buff"]
         }
       }
@@ -4934,61 +4934,61 @@
       ko: {
         "no-buff": ["부집행관", "버프 없음"],
         "mercantilism": ["부집행관", "건설 버프"],
-        "mobilize": ["교육부 장관", "교육 버프"],
+        "mobilize": ["교육부 장관", "병력 훈련 버프"],
         "research-advancement": ["부집행관", "연구 버프"]
       },
       en: {
         "no-buff": ["Vice President", "No Buff"],
         "mercantilism": ["Vice President", "Construction Buff"],
-        "mobilize": ["Minister of Education", "Education Buff"],
+        "mobilize": ["Minister of Education", "Train Troops Buff"],
         "research-advancement": ["Vice President", "Research Buff"]
       },
       ja: {
         "no-buff": ["副執政官", "バフなし"],
         "mercantilism": ["副執政官", "建造バフ"],
-        "mobilize": ["教育部長", "教育バフ"],
+        "mobilize": ["教育部長", "兵士訓練バフ"],
         "research-advancement": ["副執政官", "研究バフ"]
       },
       "zh-Hans": {
         "no-buff": ["副执政官", "无增益"],
         "mercantilism": ["副执政官", "建造增益"],
-        "mobilize": ["教育部长", "教育增益"],
+        "mobilize": ["教育部长", "训练士兵增益"],
         "research-advancement": ["副执政官", "研究增益"]
       },
       "zh-Hant": {
         "no-buff": ["副執政官", "無增益"],
         "mercantilism": ["副執政官", "建造增益"],
-        "mobilize": ["教育部長", "教育增益"],
+        "mobilize": ["教育部長", "訓練士兵增益"],
         "research-advancement": ["副執政官", "研究增益"]
       },
       es: {
         "no-buff": ["Vicepresidente", "Sin bonificación"],
         "mercantilism": ["Vicepresidente", "Bonificación de construcción"],
-        "mobilize": ["Ministro de Educación", "Bonificación de educación"],
+        "mobilize": ["Ministro de Educación", "Bonificación de entrenamiento de tropas"],
         "research-advancement": ["Vicepresidente", "Bonificación de investigación"]
       },
       pt: {
         "no-buff": ["Vice-Presidente", "Sem bônus"],
         "mercantilism": ["Vice-Presidente", "Bônus de construção"],
-        "mobilize": ["Ministro da Educação", "Bônus de educação"],
+        "mobilize": ["Ministro da Educação", "Bônus de treinamento de tropas"],
         "research-advancement": ["Vice-Presidente", "Bônus de pesquisa"]
       },
       fr: {
         "no-buff": ["Vice-président", "Aucun bonus"],
         "mercantilism": ["Vice-président", "Bonus de construction"],
-        "mobilize": ["Ministre de l’Éducation", "Bonus d’éducation"],
+        "mobilize": ["Ministre de l’Éducation", "Bonus d’entraînement des troupes"],
         "research-advancement": ["Vice-président", "Bonus de recherche"]
       },
       de: {
         "no-buff": ["Vizepräsident", "Kein Bonus"],
         "mercantilism": ["Vizepräsident", "Baubonus"],
-        "mobilize": ["Bildungsminister", "Bildungsbonus"],
+        "mobilize": ["Bildungsminister", "Truppentrainingsbonus"],
         "research-advancement": ["Vizepräsident", "Forschungsbonus"]
       },
       tr: {
         "no-buff": ["Başkan Yardımcısı", "Bonus Yok"],
         "mercantilism": ["Başkan Yardımcısı", "İnşaat Bonusu"],
-        "mobilize": ["Eğitim Bakanı", "Eğitim Bonusu"],
+        "mobilize": ["Eğitim Bakanı", "Birlik Eğitimi Bonusu"],
         "research-advancement": ["Başkan Yardımcısı", "Araştırma Bonusu"]
       }
     };
@@ -5574,13 +5574,19 @@
         render();
         return true;
       }
-      if (!supabaseClient || !sharedScheduleReady) return false;
+      if (!days.some(day => day.id === dayId) || !offices.some(office => office.id === officeId)) {
+        return false;
+      }
+      if (!supabaseClient || !sharedScheduleReady) {
+        const connected = await initializeSharedStorage({ force: true });
+        if (!connected || !supabaseClient || !sharedScheduleReady) return false;
+      }
       const previousOfficeId = dayBuffs[dayId];
       dayBuffs[dayId] = officeId;
       activeOffice = officeForDay(dayId);
       render();
 
-      const { error } = await supabaseClient
+      const { data: savedRow, error } = await supabaseClient
         .from(SUPABASE_TABLE)
         .upsert({
           slot_key: `schedule:${dayId}`,
@@ -5591,17 +5597,19 @@
           player: "",
           player_id: "",
           updated_at: new Date().toISOString()
-        }, { onConflict: "slot_key" });
+        }, { onConflict: "slot_key" })
+        .select("day_id, office_id")
+        .single();
 
-      if (error) {
+      if (error || savedRow?.day_id !== dayId || savedRow?.office_id !== officeId) {
         dayBuffs[dayId] = previousOfficeId;
         activeOffice = officeForDay(dayId);
         render();
         return false;
       }
 
-      await loadSharedDayBuffs();
-      return true;
+      const reloaded = await loadSharedDayBuffs();
+      return reloaded && dayBuffs[dayId] === officeId;
     }
 
     async function loadSharedReservations() {
