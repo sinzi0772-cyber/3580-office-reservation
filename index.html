@@ -5164,7 +5164,7 @@
       { id: "fri" }
     ];
 
-    const PREVIEW_SCHEDULE_MODE = true;
+    const PREVIEW_SCHEDULE_MODE = false;
     const PREVIEW_SCHEDULE_SOURCE = "schedule-may-18-22-data.tsv";
     const PREVIEW_DAY_DETAILS = {
       mon: { date: "May. 18", buffLabel: "Construction Buff", officeId: "mercantilism", sourceColumn: 4 },
@@ -5194,9 +5194,9 @@
     const SUPABASE_SCRIPT_TIMEOUT = 12000;
     const DEFAULT_DAY_BUFFS = {
       mon: "mercantilism",
-      tue: "mobilize",
-      thu: "research-advancement",
-      fri: "no-buff"
+      tue: "no-buff",
+      thu: "mobilize",
+      fri: "research-advancement"
     };
     const slotStarts = Array.from({ length: 48 }, (_, index) => index * 30);
 
@@ -5471,7 +5471,7 @@
 
     async function removeRealtimeChannels() {
       const client = supabaseClient;
-      const channels = [reservationRealtimeChannel, scheduleRealtimeChannel].filter(Boolean);
+      const channels = [reservationRealtimeChannel].filter(Boolean);
       realtimeGeneration += 1;
       reservationRealtimeChannel = null;
       scheduleRealtimeChannel = null;
@@ -5499,14 +5499,7 @@
       reservationRealtimeChannel = supabaseClient
         .channel("reservations-3580-by-yuri")
         .on("postgres_changes", { event: "*", schema: "public", table: SUPABASE_TABLE }, () => {
-          loadSharedReservations();
-        })
-        .subscribe(handleStatus);
-
-      scheduleRealtimeChannel = supabaseClient
-        .channel("schedule-settings-3580-by-yuri")
-        .on("postgres_changes", { event: "*", schema: "public", table: SUPABASE_SCHEDULE_TABLE }, () => {
-          loadSharedDayBuffs();
+          Promise.all([loadSharedDayBuffs(), loadSharedReservations()]);
         })
         .subscribe(handleStatus);
     }
@@ -5548,8 +5541,9 @@
     async function loadSharedDayBuffs() {
       if (!supabaseClient) return false;
       const { data: rows, error } = await supabaseClient
-        .from(SUPABASE_SCHEDULE_TABLE)
-        .select("day_id, office_id");
+        .from(SUPABASE_TABLE)
+        .select("day_id, office_id, slot_key")
+        .like("slot_key", "schedule:%");
 
       if (error) {
         sharedScheduleReady = false;
@@ -5587,12 +5581,17 @@
       render();
 
       const { error } = await supabaseClient
-        .from(SUPABASE_SCHEDULE_TABLE)
+        .from(SUPABASE_TABLE)
         .upsert({
+          slot_key: `schedule:${dayId}`,
           day_id: dayId,
           office_id: officeId,
+          slot: -1,
+          alliance: "",
+          player: "",
+          player_id: "",
           updated_at: new Date().toISOString()
-        }, { onConflict: "day_id" });
+        }, { onConflict: "slot_key" });
 
       if (error) {
         dayBuffs[dayId] = previousOfficeId;
@@ -5624,7 +5623,7 @@
       const groupedRows = {};
       rows.forEach(row => {
         const identity = reservationIdentity(row);
-        if (!identity) return;
+        if (!identity || row.slot_key !== identity.canonicalKey) return;
         (groupedRows[identity.canonicalKey] ||= []).push(row);
       });
 
@@ -5726,11 +5725,13 @@
       }
       if (!supabaseClient || !sharedReservationsReady) return false;
 
+      const canonicalKeys = days
+        .filter(day => officeForDay(day.id) === activeOffice)
+        .flatMap(day => slotStarts.map(slot => canonicalReservationKey(day.id, slot)));
       const { error } = await supabaseClient
         .from(SUPABASE_TABLE)
         .delete()
-        .eq("office_id", activeOffice)
-        .gte("slot", 0);
+        .in("slot_key", canonicalKeys);
 
       if (error) return false;
       await loadSharedReservations();
@@ -5744,7 +5745,7 @@
         markSharedStorageDisconnected();
         return false;
       }
-      if (!force && sharedReservationsReady && reservationRealtimeChannel && scheduleRealtimeChannel) {
+      if (!force && sharedReservationsReady && sharedScheduleReady && reservationRealtimeChannel) {
         return true;
       }
 
@@ -6354,7 +6355,7 @@ Forever we fight!
     });
 
     window.setInterval(() => {
-      if (!sharedReservationsReady || !reservationRealtimeChannel || !scheduleRealtimeChannel) {
+      if (!sharedReservationsReady || !sharedScheduleReady || !reservationRealtimeChannel) {
         initializeSharedStorage({ force: true });
       }
     }, 30000);
