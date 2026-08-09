@@ -5937,7 +5937,7 @@
         <section class="day-column" aria-label="${dayLabel(day.id)}">
           <div class="day-heading">
             <h3 class="day-title"><span class="day-title-label"><span>${dayLabel(day.id)}</span><time class="day-date">${previewDayDate(day.id)}</time></span>
-              <small>${escapeHtml(PREVIEW_DAY_DETAILS[day.id]?.buffLabel || officeBuffText(officeForDay(day.id)))} · ${officeName(officeForDay(day.id))}</small>
+              <small>${escapeHtml(officeBuffText(officeForDay(day.id)))} · ${officeName(officeForDay(day.id))}</small>
             </h3>
             <select class="day-buff-select admin-only" data-day-buff="${day.id}" aria-label="${dayLabel(day.id)} buff">
               ${offices.map(office => `
