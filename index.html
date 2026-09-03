@@ -5785,6 +5785,7 @@
     let reservationSourceKeys = {};
     let reservationConflicts = {};
     let reservationConflictRecords = {};
+    let reservationOrphanRecords = {};
     let supabaseClient = null;
     let sharedReservationsReady = false;
     let sharedScheduleReady = false;
@@ -5794,6 +5795,8 @@
     let supabaseReconnectTimer = null;
     let supabaseReconnectAttempt = 0;
     let sharedStorageConnecting = false;
+    let sharedRefreshPromise = null;
+    let sharedRefreshQueued = false;
     let realtimeGeneration = 0;
     let offlineNoticeShown = false;
 
@@ -6073,6 +6076,7 @@
         if (status === "SUBSCRIBED") {
           supabaseReconnectAttempt = 0;
           clearSupabaseReconnectTimer();
+          queueSharedRefresh();
           return;
         }
         if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
@@ -6083,7 +6087,7 @@
       reservationRealtimeChannel = supabaseClient
         .channel("reservations-3580-by-yuri")
         .on("postgres_changes", { event: "*", schema: "public", table: SUPABASE_TABLE }, () => {
-          Promise.all([loadSharedDayBuffs(), loadSharedReservations()]);
+          queueSharedRefresh();
         })
         .subscribe(handleStatus);
     }
@@ -6212,10 +6216,20 @@
       reservationSourceKeys = {};
       reservationConflicts = {};
       reservationConflictRecords = {};
+      reservationOrphanRecords = {};
       const groupedRows = {};
       rows.forEach(row => {
         const identity = reservationIdentity(row);
-        if (!identity || row.slot_key !== identity.canonicalKey) return;
+        if (!identity) return;
+        if (row.slot_key !== identity.canonicalKey) {
+          if (reservationKeyDetails(row.slot_key)) {
+            reservationOrphanRecords[row.slot_key] = {
+              sourceKey: row.slot_key,
+              updatedAt: row.updated_at || ""
+            };
+          }
+          return;
+        }
         (groupedRows[identity.canonicalKey] ||= []).push(row);
       });
 
@@ -6248,7 +6262,34 @@
       return true;
     }
 
-    async function saveReservation(slotKey, reservation) {
+    async function queueSharedRefresh() {
+      if (!supabaseClient) return false;
+      if (sharedRefreshPromise) {
+        sharedRefreshQueued = true;
+        return sharedRefreshPromise;
+      }
+
+      sharedRefreshPromise = (async () => {
+        let reservationsReady = true;
+        do {
+          sharedRefreshQueued = false;
+          const [, currentReservationsReady] = await Promise.all([
+            loadSharedDayBuffs(),
+            loadSharedReservations()
+          ]);
+          reservationsReady = reservationsReady && currentReservationsReady;
+        } while (sharedRefreshQueued);
+        return reservationsReady;
+      })();
+
+      try {
+        return await sharedRefreshPromise;
+      } finally {
+        sharedRefreshPromise = null;
+      }
+    }
+
+    async function saveReservation(slotKey, reservation, dayId = activeDay, slot = activeSlot) {
       if (PREVIEW_SCHEDULE_MODE) {
         data[slotKey] = { ...reservation };
         reservationSourceKeys[slotKey] = [slotKey];
@@ -6263,12 +6304,12 @@
       if (adminMode && existingSourceKey) {
         ({ error } = await supabaseClient
           .from(SUPABASE_TABLE)
-          .update(reservationToRecord(existingSourceKey, reservation))
+          .update(reservationToRecord(existingSourceKey, reservation, dayId, slot))
           .eq("slot_key", existingSourceKey));
       } else {
         ({ error } = await supabaseClient
           .from(SUPABASE_TABLE)
-          .insert(reservationToRecord(slotKey, reservation)));
+          .insert(reservationToRecord(slotKey, reservation, dayId, slot)));
       }
 
       if (error) {
@@ -6315,10 +6356,13 @@
       if (!supabaseClient || !sharedReservationsReady) return false;
       const sourceSourceKey = reservationSourceKeys[sourceKey]?.[0] || sourceKey;
       const targetReservation = data[targetKey];
+      const targetOrphan = reservationOrphanRecords[targetKey];
 
-      if (targetReservation) {
-        const targetSourceKey = reservationSourceKeys[targetKey]?.[0] || targetKey;
-        const { error: overwriteError } = await supabaseClient
+      if (targetReservation || targetOrphan) {
+        const targetSourceKey = targetReservation
+          ? (reservationSourceKeys[targetKey]?.[0] || targetKey)
+          : targetOrphan.sourceKey;
+        let overwriteQuery = supabaseClient
           .from(SUPABASE_TABLE)
           .update(reservationToRecord(
             targetSourceKey,
@@ -6327,8 +6371,12 @@
             targetDetails.slot
           ))
           .eq("slot_key", targetSourceKey);
+        if (targetOrphan?.updatedAt) {
+          overwriteQuery = overwriteQuery.eq("updated_at", targetOrphan.updatedAt);
+        }
+        const { data: overwrittenRows, error: overwriteError } = await overwriteQuery.select("slot_key");
 
-        if (overwriteError) {
+        if (overwriteError || !overwrittenRows?.length) {
           await loadSharedReservations();
           return false;
         }
@@ -6372,13 +6420,41 @@
     async function copyReservation(sourceKey, targetKey) {
       if (sourceKey === targetKey) return true;
       const sourceReservation = data[sourceKey];
-      if (!sourceReservation || !reservationKeyDetails(targetKey)) return false;
+      const targetDetails = reservationKeyDetails(targetKey);
+      if (!sourceReservation || !targetDetails) return false;
+
+      const targetOrphan = reservationOrphanRecords[targetKey];
+      if (!PREVIEW_SCHEDULE_MODE && targetOrphan && !data[targetKey]) {
+        let repairQuery = supabaseClient
+          .from(SUPABASE_TABLE)
+          .update(reservationToRecord(
+            targetKey,
+            sourceReservation,
+            targetDetails.dayId,
+            targetDetails.slot
+          ))
+          .eq("slot_key", targetOrphan.sourceKey);
+        if (targetOrphan.updatedAt) {
+          repairQuery = repairQuery.eq("updated_at", targetOrphan.updatedAt);
+        }
+        const { data: repairedRows, error: repairError } = await repairQuery.select("slot_key");
+        if (repairError || !repairedRows?.length) {
+          await loadSharedReservations();
+          return false;
+        }
+        await loadSharedReservations();
+        const repairedReservation = data[targetKey];
+        return Boolean(data[sourceKey])
+          && Boolean(repairedReservation)
+          && repairedReservation.player === sourceReservation.player
+          && repairedReservation.playerId === sourceReservation.playerId;
+      }
 
       const result = await saveReservation(targetKey, {
         alliance: sourceReservation.alliance || sourceReservation.kingdom || "",
         player: sourceReservation.player || "",
         playerId: sourceReservation.playerId || ""
-      });
+      }, targetDetails.dayId, targetDetails.slot);
       if (!result.ok) return false;
 
       const copiedReservation = data[targetKey];
@@ -7414,6 +7490,8 @@ Forever we fight!
     window.setInterval(() => {
       if (!sharedReservationsReady || !sharedScheduleReady || !reservationRealtimeChannel) {
         initializeSharedStorage({ force: true });
+      } else {
+        queueSharedRefresh();
       }
     }, 30000);
 
