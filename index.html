@@ -4607,6 +4607,8 @@
     body.admin-mode #slotList .slot.is-booked[draggable="true"] {
       cursor: grab;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     body.admin-mode #slotList .slot.is-booked[draggable="true"]:active {
@@ -4633,28 +4635,6 @@
         linear-gradient(135deg, rgba(155, 55, 47, .24), transparent 58%),
         rgba(31, 21, 21, .95) !important;
       box-shadow: inset 0 0 0 2px rgba(221, 112, 101, .32), 0 20px 44px rgba(0, 0, 0, .4) !important;
-    }
-
-    .slot-drag-hint {
-      position: absolute;
-      top: 7px;
-      left: 50%;
-      z-index: 4;
-      max-width: 42%;
-      padding: 3px 7px;
-      overflow: hidden;
-      transform: translateX(-50%);
-      border: 1px solid rgba(207, 181, 119, .24);
-      border-radius: 999px;
-      color: #cdb77f;
-      background: rgba(5, 6, 7, .78);
-      font-size: 9px;
-      font-weight: 750;
-      letter-spacing: .02em;
-      line-height: 1.1;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      pointer-events: none;
     }
 
     .availability-panel {
@@ -5793,6 +5773,13 @@
     let activeSlot = null;
     let adminMode = false;
     let draggedReservationKey = null;
+    let touchDragTimer = null;
+    let touchDragIdentifier = null;
+    let touchDragStartX = 0;
+    let touchDragStartY = 0;
+    let touchDragSourceCard = null;
+    let touchDragTargetKey = null;
+    let touchDragActive = false;
     let data = load();
     let dayBuffs = { ...DEFAULT_DAY_BUFFS };
     let reservationSourceKeys = {};
@@ -6768,9 +6755,8 @@
                   data-slot="${slot}"
                   draggable="${reserved && adminMode ? "true" : "false"}"
                   ${!reserved ? `role="button" tabindex="0" aria-label="${escapeHtml(`${dayLabel(day.id)} ${utcRange(slot)} ${t("available")} ${t("reserve")}`)}"` : `tabindex="-1"`}
-                  ${reserved && adminMode ? `aria-grabbed="false" title="${escapeHtml(slotInteractionMessage("dragHint"))}"` : ""}
+                  ${reserved && adminMode ? `aria-grabbed="false"` : ""}
                 >
-                  ${reserved && adminMode ? `<span class="slot-drag-hint admin-only" aria-hidden="true">↕ ${escapeHtml(slotInteractionMessage("dragHint"))}</span>` : ""}
                   <div class="slot-head">
                     <div class="time">${utcRange(slot)}</div>
                     <div class="timezone-stack">
@@ -6858,11 +6844,51 @@
     }
 
     function clearReservationDragState() {
+      if (touchDragTimer) clearTimeout(touchDragTimer);
       slotList.querySelectorAll(".is-dragging, .is-drop-target").forEach(card => {
         card.classList.remove("is-dragging", "is-drop-target");
         if (card.hasAttribute("aria-grabbed")) card.setAttribute("aria-grabbed", "false");
       });
       draggedReservationKey = null;
+      touchDragTimer = null;
+      touchDragIdentifier = null;
+      touchDragSourceCard = null;
+      touchDragTargetKey = null;
+      touchDragActive = false;
+    }
+
+    function touchByIdentifier(touchList, identifier) {
+      return Array.from(touchList || []).find(touch => touch.identifier === identifier) || null;
+    }
+
+    function updateReservationDropTarget(clientX, clientY, sourceKey) {
+      const pointedElement = document.elementFromPoint(clientX, clientY);
+      const targetCard = pointedElement?.closest(".slot[data-slot-key]");
+      const validTarget = targetCard && targetCard.dataset.slotKey !== sourceKey ? targetCard : null;
+      slotList.querySelectorAll(".slot.is-drop-target").forEach(card => {
+        if (card !== validTarget) card.classList.remove("is-drop-target");
+      });
+      if (validTarget) validTarget.classList.add("is-drop-target");
+      touchDragTargetKey = validTarget?.dataset.slotKey || null;
+    }
+
+    function autoScrollReservationDrag(clientX, clientY) {
+      const edge = 64;
+      const verticalStep = 18;
+      if (clientY < edge) window.scrollBy(0, -verticalStep);
+      else if (clientY > window.innerHeight - edge) window.scrollBy(0, verticalStep);
+
+      let horizontalScroller = slotList;
+      while (horizontalScroller && horizontalScroller !== document.body) {
+        const style = getComputedStyle(horizontalScroller);
+        if (/(auto|scroll)/.test(style.overflowX)
+            && horizontalScroller.scrollWidth > horizontalScroller.clientWidth + 4) break;
+        horizontalScroller = horizontalScroller.parentElement;
+      }
+      if (!horizontalScroller || horizontalScroller === document.body) return;
+      const bounds = horizontalScroller.getBoundingClientRect();
+      if (clientX < bounds.left + edge) horizontalScroller.scrollLeft -= verticalStep;
+      else if (clientX > bounds.right - edge) horizontalScroller.scrollLeft += verticalStep;
     }
 
     function chooseReservationDragAction(sourceKey, targetKey) {
@@ -7023,6 +7049,73 @@
     });
 
     slotList.addEventListener("dragend", clearReservationDragState);
+
+    slotList.addEventListener("touchstart", event => {
+      if (!adminMode || event.touches.length !== 1) return;
+      if (event.target.closest("button, input, select, a")) return;
+      const slotCard = event.target.closest(".slot.is-booked[data-slot-key]");
+      if (!slotCard || !data[slotCard.dataset.slotKey]) return;
+
+      clearReservationDragState();
+      const touch = event.touches[0];
+      touchDragIdentifier = touch.identifier;
+      touchDragStartX = touch.clientX;
+      touchDragStartY = touch.clientY;
+      touchDragSourceCard = slotCard;
+      touchDragTimer = setTimeout(() => {
+        if (!adminMode || !touchDragSourceCard || !data[touchDragSourceCard.dataset.slotKey]) {
+          clearReservationDragState();
+          return;
+        }
+        touchDragTimer = null;
+        touchDragActive = true;
+        draggedReservationKey = touchDragSourceCard.dataset.slotKey;
+        touchDragSourceCard.classList.add("is-dragging");
+        touchDragSourceCard.setAttribute("aria-grabbed", "true");
+      }, 360);
+    }, { passive: true });
+
+    slotList.addEventListener("touchmove", event => {
+      if (touchDragIdentifier === null) return;
+      const touch = touchByIdentifier(event.touches, touchDragIdentifier);
+      if (!touch) return;
+
+      if (!touchDragActive) {
+        if (Math.hypot(touch.clientX - touchDragStartX, touch.clientY - touchDragStartY) > 10) {
+          clearReservationDragState();
+        }
+        return;
+      }
+
+      event.preventDefault();
+      autoScrollReservationDrag(touch.clientX, touch.clientY);
+      updateReservationDropTarget(touch.clientX, touch.clientY, draggedReservationKey);
+    }, { passive: false });
+
+    slotList.addEventListener("touchend", async event => {
+      if (touchDragIdentifier === null) return;
+      const endedTouch = touchByIdentifier(event.changedTouches, touchDragIdentifier);
+      if (!endedTouch) return;
+      const sourceKey = draggedReservationKey;
+      if (touchDragActive) {
+        event.preventDefault();
+        updateReservationDropTarget(endedTouch.clientX, endedTouch.clientY, sourceKey);
+      }
+      const targetKey = touchDragTargetKey;
+      const shouldChooseAction = touchDragActive && sourceKey && targetKey && sourceKey !== targetKey;
+      clearReservationDragState();
+      if (!shouldChooseAction) return;
+      const action = await chooseReservationDragAction(sourceKey, targetKey);
+      if (!action) return;
+      await handleReservationDrop(sourceKey, targetKey, action);
+    }, { passive: false });
+
+    slotList.addEventListener("touchcancel", clearReservationDragState, { passive: true });
+
+    slotList.addEventListener("contextmenu", event => {
+      if (!adminMode || !event.target.closest(".slot.is-booked[data-slot-key]")) return;
+      event.preventDefault();
+    });
 
     slotList.addEventListener("change", async event => {
       const buffSelect = event.target.closest("[data-day-buff]");
