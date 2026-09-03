@@ -6100,6 +6100,14 @@
       };
     }
 
+    function reservationsMatch(first, second) {
+      if (!first || !second) return false;
+      return String(first.alliance || first.kingdom || "").trim().toLowerCase()
+          === String(second.alliance || second.kingdom || "").trim().toLowerCase()
+        && String(first.player || "").trim() === String(second.player || "").trim()
+        && String(first.playerId || "").trim() === String(second.playerId || "").trim();
+    }
+
     function reservationToRecord(slotKey, reservation, dayId = activeDay, slot = activeSlot) {
       return {
         slot_key: slotKey,
@@ -6314,6 +6322,9 @@
 
       if (error) {
         await loadSharedReservations();
+        if (error.code === "23505" && reservationsMatch(data[slotKey], reservation)) {
+          return { ok: true, reason: "already-saved" };
+        }
         return { ok: false, reason: error.code === "23505" ? "conflict" : "storage" };
       }
 
