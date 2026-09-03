@@ -502,6 +502,18 @@
       margin-top: 18px;
     }
 
+    .modal-actions.drag-action-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .drag-action-options button {
+      width: 100%;
+      min-width: 0;
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+
     .cancel, .modal-actions .reserve {
       min-height: 44px;
       padding: 0 16px;
@@ -4568,6 +4580,318 @@
       box-shadow: inset 0 0 0 1px rgba(255, 174, 94, .18), 0 16px 34px rgba(0, 0, 0, .24) !important;
     }
 
+    .reset-all-btn {
+      margin-top: 10px !important;
+      color: #f5d9d6 !important;
+      border-color: rgba(190, 79, 72, .72) !important;
+      background: linear-gradient(180deg, rgba(92, 30, 28, .96), rgba(53, 19, 18, .98)) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 8px 18px rgba(0, 0, 0, .28) !important;
+    }
+
+    .reset-all-btn:hover {
+      color: #fff4f2 !important;
+      border-color: rgba(226, 112, 103, .92) !important;
+      background: linear-gradient(180deg, rgba(118, 38, 34, .98), rgba(68, 23, 21, 1)) !important;
+    }
+
+    #slotList .slot.is-open {
+      cursor: pointer;
+    }
+
+    #slotList .slot.is-open:focus-visible {
+      outline: 2px solid rgba(225, 188, 109, .95);
+      outline-offset: -4px;
+      box-shadow: inset 0 0 0 2px rgba(225, 188, 109, .22), 0 18px 40px rgba(0, 0, 0, .3) !important;
+    }
+
+    body.admin-mode #slotList .slot.is-booked[draggable="true"] {
+      cursor: grab;
+      user-select: none;
+    }
+
+    body.admin-mode #slotList .slot.is-booked[draggable="true"]:active {
+      cursor: grabbing;
+    }
+
+    #slotList .slot.is-dragging {
+      opacity: .46;
+      transform: scale(.985);
+      filter: saturate(.7);
+    }
+
+    #slotList .slot.is-drop-target {
+      border-color: rgba(232, 193, 112, .95) !important;
+      background:
+        linear-gradient(135deg, rgba(218, 177, 91, .19), transparent 52%),
+        rgba(26, 25, 21, .94) !important;
+      box-shadow: inset 0 0 0 2px rgba(232, 193, 112, .34), 0 20px 44px rgba(0, 0, 0, .4) !important;
+    }
+
+    #slotList .slot.is-booked.is-drop-target {
+      border-color: rgba(221, 112, 101, .98) !important;
+      background:
+        linear-gradient(135deg, rgba(155, 55, 47, .24), transparent 58%),
+        rgba(31, 21, 21, .95) !important;
+      box-shadow: inset 0 0 0 2px rgba(221, 112, 101, .32), 0 20px 44px rgba(0, 0, 0, .4) !important;
+    }
+
+    .slot-drag-hint {
+      position: absolute;
+      top: 7px;
+      left: 50%;
+      z-index: 4;
+      max-width: 42%;
+      padding: 3px 7px;
+      overflow: hidden;
+      transform: translateX(-50%);
+      border: 1px solid rgba(207, 181, 119, .24);
+      border-radius: 999px;
+      color: #cdb77f;
+      background: rgba(5, 6, 7, .78);
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: .02em;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .availability-panel {
+      margin: 0 0 16px;
+      padding: 15px;
+      border: 1px solid rgba(207, 181, 119, .18);
+      border-radius: 12px;
+      background: rgba(9, 11, 13, .96);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025), 0 16px 34px rgba(0, 0, 0, .2);
+    }
+
+    .availability-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 13px;
+    }
+
+    .availability-heading {
+      display: grid;
+      gap: 3px;
+    }
+
+    .availability-heading strong {
+      color: #f4eee2;
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: -.01em;
+    }
+
+    .availability-heading span {
+      color: #aaa59b;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .preview-reset-button {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1px solid rgba(211, 103, 94, .72);
+      border-radius: 9px;
+      color: #ffdcd7;
+      background: linear-gradient(180deg, rgba(101, 34, 31, .96), rgba(59, 22, 21, .98));
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .preview-reset-button:hover,
+    .preview-reset-button:focus-visible {
+      border-color: rgba(234, 125, 115, .95);
+      outline: none;
+      color: #fff6f3;
+      background: linear-gradient(180deg, rgba(127, 42, 38, .98), rgba(75, 27, 25, 1));
+    }
+
+    .availability-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .availability-card {
+      position: relative;
+      display: grid;
+      min-width: 0;
+      min-height: 148px;
+      padding: 15px 16px;
+      overflow: hidden;
+      border: 1px solid rgba(207, 181, 119, .2) !important;
+      border-radius: 10px !important;
+      color: #ece6da !important;
+      background: rgba(16, 18, 20, .98) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .availability-card:hover,
+    .availability-card:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(218, 181, 101, .46) !important;
+      outline: none;
+      background: rgba(20, 22, 24, .99) !important;
+    }
+
+    .availability-card.is-full {
+      border-color: rgba(207, 181, 119, .14) !important;
+      background: rgba(15, 16, 18, .98) !important;
+    }
+
+    .availability-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .availability-day {
+      overflow: hidden;
+      color: #fff9ee;
+      font-size: 16px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .availability-status {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #b7e0a9;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .availability-status::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #86b978;
+      box-shadow: 0 0 0 3px rgba(134, 185, 120, .1);
+      content: "";
+    }
+
+    .availability-card.is-full .availability-status {
+      color: #efaba4;
+    }
+
+    .availability-card.is-full .availability-status::before {
+      background: #cc746c;
+      box-shadow: 0 0 0 3px rgba(204, 116, 108, .1);
+    }
+
+    .availability-next {
+      margin-top: 6px;
+      overflow: hidden;
+      color: #d0cbc1;
+      font-size: 11px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .availability-times,
+    .availability-alliances {
+      display: grid;
+      gap: 5px;
+      margin-top: 12px;
+    }
+
+    .availability-detail-label {
+      color: #a9a49b;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .03em;
+    }
+
+    .availability-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .availability-time-chip,
+    .availability-alliance-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 23px;
+      padding: 3px 7px;
+      border: 1px solid rgba(207, 181, 119, .18);
+      border-radius: 6px;
+      color: #ddd8cf;
+      background: rgba(5, 6, 7, .62);
+      font-size: 10px;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .availability-alliance-chip strong {
+      margin-right: 7px;
+      color: #eee9df;
+      font-size: 10px;
+    }
+
+    .availability-person-icon {
+      margin-right: 3px;
+      color: #c8ae72;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .availability-empty {
+      color: #85827c;
+      font-size: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .availability-panel {
+        padding: 13px;
+      }
+
+      .availability-toolbar {
+        align-items: stretch;
+      }
+
+      .availability-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .availability-card {
+        min-height: 148px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .availability-toolbar {
+        display: grid;
+      }
+
+      .preview-reset-button {
+        width: 100%;
+      }
+
+      .availability-strip {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
     body.admin-mode #slotList .slot.is-booked.has-sync-conflict {
       height: auto !important;
       min-height: 390px !important;
@@ -4755,6 +5079,7 @@
         </h2>
         <p class="buff" id="officeBuff">Vice President</p>
         <button class="tool-btn admin-only" id="clearBtn" type="button">Clear Current Office</button>
+        <button class="tool-btn reset-all-btn admin-only" id="resetAllBtn" type="button">Reset All Reservations</button>
       </div>
 
     </section>
@@ -4772,6 +5097,16 @@
         <span>Time Format</span>
         <strong>UTC / KST, 30 min</strong>
       </div>
+    </section>
+
+    <section class="availability-panel" id="availabilityPanel">
+      <div class="availability-toolbar">
+        <div class="availability-heading">
+          <strong id="availabilityHeading">Daily Availability</strong>
+        </div>
+        <button class="preview-reset-button" id="previewResetBtn" type="button" hidden>Reset All Reservations</button>
+      </div>
+      <div class="availability-strip" id="availabilityStrip" aria-label="Daily availability"></div>
     </section>
 
     <section class="board" id="slotList"></section>
@@ -4810,6 +5145,18 @@
       <div class="modal-actions">
         <button class="cancel" value="cancel" type="button" id="adminCancelBtn">Cancel</button>
         <button class="reserve" value="default" type="submit" id="loginBtn">Login</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dragActionDialog">
+    <form class="modal" method="dialog">
+      <h2 id="dragActionTitle">Choose Action</h2>
+      <p id="dragActionHelp"></p>
+      <div class="modal-actions drag-action-options">
+        <button class="cancel" value="cancel" type="submit" id="dragActionCancel">Cancel</button>
+        <button class="tool-btn" value="copy" type="submit" id="dragActionCopy">Copy</button>
+        <button class="reserve" value="move" type="submit" id="dragActionMove">Move</button>
       </div>
     </form>
   </dialog>
@@ -5157,6 +5504,245 @@
       }
     });
 
+    const resetAllText = {
+      ko: {
+        label: "모든 예약 초기화",
+        confirm: "모든 요일의 예약자 정보를 삭제할까요? 이 작업은 되돌릴 수 없습니다. 요일별 버프 설정은 유지됩니다.",
+        confirmAgain: "마지막 확인입니다. 정말 모든 예약을 삭제할까요?",
+        done: "모든 예약이 초기화되었습니다."
+      },
+      en: {
+        label: "Reset All Reservations",
+        confirm: "Delete every reservation for all days? This cannot be undone. Daily buff settings will be kept.",
+        confirmAgain: "Final confirmation: Are you sure you want to delete every reservation?",
+        done: "All reservations have been reset."
+      },
+      ja: {
+        label: "すべての予約をリセット",
+        confirm: "すべての曜日の予約を削除しますか？この操作は元に戻せません。曜日ごとのバフ設定は保持されます。",
+        confirmAgain: "最終確認です。本当にすべての予約を削除しますか？",
+        done: "すべての予約をリセットしました。"
+      },
+      "zh-Hans": {
+        label: "重置全部预约",
+        confirm: "删除所有日期的预约吗？此操作无法撤销。每日增益设置将保留。",
+        confirmAgain: "最后确认：确定要删除全部预约吗？",
+        done: "全部预约已重置。"
+      },
+      "zh-Hant": {
+        label: "重設全部預約",
+        confirm: "刪除所有日期的預約嗎？此操作無法復原。每日增益設定將保留。",
+        confirmAgain: "最後確認：確定要刪除全部預約嗎？",
+        done: "全部預約已重設。"
+      },
+      es: {
+        label: "Restablecer todas las reservas",
+        confirm: "¿Eliminar todas las reservas de todos los días? Esta acción no se puede deshacer. Se conservarán los ajustes diarios de bonificación.",
+        confirmAgain: "Confirmación final: ¿Seguro que quieres eliminar todas las reservas?",
+        done: "Se restablecieron todas las reservas."
+      },
+      pt: {
+        label: "Redefinir todas as reservas",
+        confirm: "Excluir todas as reservas de todos os dias? Esta ação não pode ser desfeita. As configurações diárias de bônus serão mantidas.",
+        confirmAgain: "Confirmação final: deseja mesmo excluir todas as reservas?",
+        done: "Todas as reservas foram redefinidas."
+      },
+      fr: {
+        label: "Réinitialiser toutes les réservations",
+        confirm: "Supprimer toutes les réservations de tous les jours ? Cette action est irréversible. Les réglages quotidiens des bonus seront conservés.",
+        confirmAgain: "Dernière confirmation : supprimer vraiment toutes les réservations ?",
+        done: "Toutes les réservations ont été réinitialisées."
+      },
+      de: {
+        label: "Alle Reservierungen zurücksetzen",
+        confirm: "Alle Reservierungen für alle Tage löschen? Dies kann nicht rückgängig gemacht werden. Die täglichen Buff-Einstellungen bleiben erhalten.",
+        confirmAgain: "Letzte Bestätigung: Wirklich alle Reservierungen löschen?",
+        done: "Alle Reservierungen wurden zurückgesetzt."
+      },
+      tr: {
+        label: "Tüm Rezervasyonları Sıfırla",
+        confirm: "Tüm günlerdeki rezervasyonlar silinsin mi? Bu işlem geri alınamaz. Günlük güçlendirme ayarları korunacaktır.",
+        confirmAgain: "Son onay: Tüm rezervasyonlar gerçekten silinsin mi?",
+        done: "Tüm rezervasyonlar sıfırlandı."
+      }
+    };
+
+    function resetAllMessage(key) {
+      return resetAllText[currentLang]?.[key] || resetAllText.en[key];
+    }
+
+    const slotInteractionText = {
+      ko: {
+        dragHint: "드래그해 이동/복사",
+        actionTitle: "예약 처리 방식",
+        actionHelp: "{source} 예약을 {target}(으)로 어떻게 처리할까요?",
+        move: "이동",
+        copy: "복사",
+        cancel: "취소",
+        occupiedConfirm: "{target}에는 {player}님의 예약이 있습니다.\n기존 예약을 지우고 변경할까요?",
+        occupiedCopyConfirm: "{target}에는 {player}님의 예약이 있습니다.\n기존 예약을 지우고 복사할까요?",
+        moved: "예약 시간을 옮겼습니다.",
+        copied: "예약을 복사했습니다.",
+        moveFailed: "예약 이동에 실패했습니다. 일정을 다시 확인해 주세요.",
+        copyFailed: "예약 복사에 실패했습니다. 일정을 다시 확인해 주세요."
+      },
+      en: {
+        dragHint: "Drag to move/copy",
+        actionTitle: "Reservation Action",
+        actionHelp: "How should {source} be placed at {target}?",
+        move: "Move",
+        copy: "Copy",
+        cancel: "Cancel",
+        occupiedConfirm: "{target} is already reserved by {player}.\nReplace that reservation and move this one?",
+        occupiedCopyConfirm: "{target} is already reserved by {player}.\nReplace that reservation and copy this one?",
+        moved: "The reservation was moved.",
+        copied: "The reservation was copied.",
+        moveFailed: "The reservation could not be moved. Please check the schedule again.",
+        copyFailed: "The reservation could not be copied. Please check the schedule again."
+      },
+      ja: {
+        dragHint: "ドラッグして移動/コピー",
+        actionTitle: "予約の処理方法",
+        actionHelp: "{source}の予約を{target}へどのように反映しますか？",
+        move: "移動",
+        copy: "コピー",
+        cancel: "キャンセル",
+        occupiedConfirm: "{target}は{player}さんが予約済みです。\n既存の予約を削除して変更しますか？",
+        occupiedCopyConfirm: "{target}は{player}さんが予約済みです。\n既存の予約を削除してコピーしますか？",
+        moved: "予約時間を移動しました。",
+        copied: "予約をコピーしました。",
+        moveFailed: "予約を移動できませんでした。日程を再確認してください。",
+        copyFailed: "予約をコピーできませんでした。日程を再確認してください。"
+      },
+      "zh-Hans": {
+        dragHint: "拖动以移动/复制",
+        actionTitle: "预约操作",
+        actionHelp: "如何将{source}安排到{target}？",
+        move: "移动",
+        copy: "复制",
+        cancel: "取消",
+        occupiedConfirm: "{target}已由{player}预约。\n要删除原预约并更改吗？",
+        occupiedCopyConfirm: "{target}已由{player}预约。\n要删除原预约并复制吗？",
+        moved: "预约时间已移动。",
+        copied: "预约已复制。",
+        moveFailed: "无法移动预约，请重新查看日程。",
+        copyFailed: "无法复制预约，请重新查看日程。"
+      },
+      "zh-Hant": {
+        dragHint: "拖曳以移動/複製",
+        actionTitle: "預約操作",
+        actionHelp: "如何將{source}安排到{target}？",
+        move: "移動",
+        copy: "複製",
+        cancel: "取消",
+        occupiedConfirm: "{target}已由{player}預約。\n要刪除原預約並變更嗎？",
+        occupiedCopyConfirm: "{target}已由{player}預約。\n要刪除原預約並複製嗎？",
+        moved: "預約時間已移動。",
+        copied: "預約已複製。",
+        moveFailed: "無法移動預約，請重新查看日程。",
+        copyFailed: "無法複製預約，請重新查看日程。"
+      },
+      es: {
+        dragHint: "Arrastra para mover/copiar",
+        actionTitle: "Acción de reserva",
+        actionHelp: "¿Cómo colocar {source} en {target}?",
+        move: "Mover",
+        copy: "Copiar",
+        cancel: "Cancelar",
+        occupiedConfirm: "{target} ya está reservado por {player}.\n¿Reemplazar esa reserva y mover esta?",
+        occupiedCopyConfirm: "{target} ya está reservado por {player}.\n¿Reemplazar esa reserva y copiar esta?",
+        moved: "La reserva se trasladó.",
+        copied: "La reserva se copió.",
+        moveFailed: "No se pudo trasladar la reserva. Revisa el horario.",
+        copyFailed: "No se pudo copiar la reserva. Revisa el horario."
+      },
+      pt: {
+        dragHint: "Arraste para mover/copiar",
+        actionTitle: "Ação da reserva",
+        actionHelp: "Como colocar {source} em {target}?",
+        move: "Mover",
+        copy: "Copiar",
+        cancel: "Cancelar",
+        occupiedConfirm: "{target} já está reservado por {player}.\nSubstituir essa reserva e mover esta?",
+        occupiedCopyConfirm: "{target} já está reservado por {player}.\nSubstituir essa reserva e copiar esta?",
+        moved: "A reserva foi movida.",
+        copied: "A reserva foi copiada.",
+        moveFailed: "Não foi possível mover a reserva. Verifique a agenda.",
+        copyFailed: "Não foi possível copiar a reserva. Verifique a agenda."
+      },
+      fr: {
+        dragHint: "Glisser pour déplacer/copier",
+        actionTitle: "Action de réservation",
+        actionHelp: "Comment placer {source} sur {target} ?",
+        move: "Déplacer",
+        copy: "Copier",
+        cancel: "Annuler",
+        occupiedConfirm: "{target} est déjà réservé par {player}.\nRemplacer cette réservation et déplacer celle-ci ?",
+        occupiedCopyConfirm: "{target} est déjà réservé par {player}.\nRemplacer cette réservation et copier celle-ci ?",
+        moved: "La réservation a été déplacée.",
+        copied: "La réservation a été copiée.",
+        moveFailed: "La réservation n’a pas pu être déplacée. Vérifiez le planning.",
+        copyFailed: "La réservation n’a pas pu être copiée. Vérifiez le planning."
+      },
+      de: {
+        dragHint: "Zum Verschieben/Kopieren ziehen",
+        actionTitle: "Reservierungsaktion",
+        actionHelp: "Wie soll {source} auf {target} übernommen werden?",
+        move: "Verschieben",
+        copy: "Kopieren",
+        cancel: "Abbrechen",
+        occupiedConfirm: "{target} ist bereits von {player} reserviert.\nDiese Reservierung ersetzen und verschieben?",
+        occupiedCopyConfirm: "{target} ist bereits von {player} reserviert.\nDiese Reservierung ersetzen und kopieren?",
+        moved: "Die Reservierung wurde verschoben.",
+        copied: "Die Reservierung wurde kopiert.",
+        moveFailed: "Die Reservierung konnte nicht verschoben werden. Bitte den Plan prüfen.",
+        copyFailed: "Die Reservierung konnte nicht kopiert werden. Bitte den Plan prüfen."
+      },
+      tr: {
+        dragHint: "Taşımak/kopyalamak için sürükle",
+        actionTitle: "Rezervasyon işlemi",
+        actionHelp: "{source}, {target} konumuna nasıl yerleştirilsin?",
+        move: "Taşı",
+        copy: "Kopyala",
+        cancel: "İptal",
+        occupiedConfirm: "{target}, {player} tarafından rezerve edilmiş.\nMevcut rezervasyon silinip bununla değiştirilsin mi?",
+        occupiedCopyConfirm: "{target}, {player} tarafından rezerve edilmiş.\nMevcut rezervasyon silinip kopyalansın mı?",
+        moved: "Rezervasyon taşındı.",
+        copied: "Rezervasyon kopyalandı.",
+        moveFailed: "Rezervasyon taşınamadı. Programı yeniden kontrol edin.",
+        copyFailed: "Rezervasyon kopyalanamadı. Programı yeniden kontrol edin."
+      }
+    };
+
+    function slotInteractionMessage(key, values = {}) {
+      const template = slotInteractionText[currentLang]?.[key] || slotInteractionText.en[key] || "";
+      return Object.entries(values).reduce(
+        (message, [name, value]) => message.replaceAll(`{${name}}`, String(value || "-")),
+        template
+      );
+    }
+
+    const availabilityText = {
+      ko: { region: "요일별 예약 가능 현황", help: "요일을 누르면 해당 예약표로 이동합니다.", available: "예약 가능", spots: "자리", next: "다음 가능", full: "예약 마감", openTimes: "가능 시간", alliances: "연맹별 신청", people: "명", none: "신청 없음", aria: "{day}: {count}자리 예약 가능" },
+      en: { region: "Daily Availability", help: "Select a day to jump to its reservation list.", available: "Available", spots: "spots", next: "Next", full: "Full", openTimes: "Open times", alliances: "Alliance bookings", people: "people", none: "No bookings", aria: "{day}: {count} spots available" },
+      ja: { region: "曜日別の予約状況", help: "曜日を選ぶと予約一覧へ移動します。", available: "予約可能", spots: "枠", next: "次の空き", full: "満席", openTimes: "空き時間", alliances: "同盟別予約", people: "名", none: "予約なし", aria: "{day}: 予約可能 {count}枠" },
+      "zh-Hans": { region: "每日可预约情况", help: "选择日期即可跳转到预约列表。", available: "可预约", spots: "个空位", next: "下一个", full: "已满", openTimes: "可预约时间", alliances: "联盟预约", people: "人", none: "暂无预约", aria: "{day}：还有{count}个空位" },
+      "zh-Hant": { region: "每日可預約情況", help: "選擇日期即可跳轉至預約列表。", available: "可預約", spots: "個空位", next: "下一個", full: "已滿", openTimes: "可預約時間", alliances: "聯盟預約", people: "人", none: "暫無預約", aria: "{day}：還有{count}個空位" },
+      es: { region: "Disponibilidad diaria", help: "Selecciona un día para ir a sus reservas.", available: "Disponible", spots: "plazas", next: "Siguiente", full: "Completo", openTimes: "Horarios libres", alliances: "Reservas por alianza", people: "personas", none: "Sin reservas", aria: "{day}: {count} plazas disponibles" },
+      pt: { region: "Disponibilidade diária", help: "Selecione um dia para ir às reservas.", available: "Disponível", spots: "vagas", next: "Próximo", full: "Lotado", openTimes: "Horários livres", alliances: "Reservas por aliança", people: "pessoas", none: "Sem reservas", aria: "{day}: {count} vagas disponíveis" },
+      fr: { region: "Disponibilités par jour", help: "Sélectionnez un jour pour afficher ses réservations.", available: "Disponible", spots: "places", next: "Prochain", full: "Complet", openTimes: "Créneaux libres", alliances: "Réservations par alliance", people: "personnes", none: "Aucune réservation", aria: "{day} : {count} places disponibles" },
+      de: { region: "Tägliche Verfügbarkeit", help: "Tag auswählen, um zur Reservierungsliste zu springen.", available: "Verfügbar", spots: "Plätze", next: "Nächster", full: "Ausgebucht", openTimes: "Freie Zeiten", alliances: "Buchungen je Allianz", people: "Personen", none: "Keine Buchungen", aria: "{day}: {count} Plätze verfügbar" },
+      tr: { region: "Günlük uygunluk", help: "Rezervasyon listesine gitmek için bir gün seçin.", available: "Uygun", spots: "yer", next: "Sonraki", full: "Dolu", openTimes: "Uygun saatler", alliances: "İttifak rezervasyonları", people: "kişi", none: "Rezervasyon yok", aria: "{day}: {count} yer uygun" }
+    };
+
+    function availabilityMessage(key, values = {}) {
+      const template = availabilityText[currentLang]?.[key] || availabilityText.en[key] || "";
+      return Object.entries(values).reduce(
+        (message, [name, value]) => message.replaceAll(`{${name}}`, String(value ?? "-")),
+        template
+      );
+    }
+
     const days = [
       { id: "mon" },
       { id: "tue" },
@@ -5164,7 +5750,8 @@
       { id: "fri" }
     ];
 
-    const PREVIEW_SCHEDULE_MODE = false;
+    const PREVIEW_SCHEDULE_MODE = /^(127\.0\.0\.1|localhost)$/.test(window.location.hostname)
+      && new URLSearchParams(window.location.search).has("interaction-preview");
     const PREVIEW_SCHEDULE_SOURCE = "schedule-may-18-22-data.tsv";
     const PREVIEW_DAY_DETAILS = {
       mon: { date: "May. 18", buffLabel: "Construction Buff", officeId: "mercantilism", sourceColumn: 4 },
@@ -5205,6 +5792,7 @@
     let activeOffice = "mercantilism";
     let activeSlot = null;
     let adminMode = false;
+    let draggedReservationKey = null;
     let data = load();
     let dayBuffs = { ...DEFAULT_DAY_BUFFS };
     let reservationSourceKeys = {};
@@ -5226,11 +5814,20 @@
     const langSelect = document.querySelector("#langSelect");
     const officeBuff = document.querySelector("#officeBuff");
     const slotList = document.querySelector("#slotList");
+    const availabilityStrip = document.querySelector("#availabilityStrip");
+    const availabilityHeading = document.querySelector("#availabilityHeading");
+    const previewResetBtn = document.querySelector("#previewResetBtn");
     const dialog = document.querySelector("#reserveDialog");
     const form = document.querySelector("#reserveForm");
     const adminDialog = document.querySelector("#adminDialog");
     const adminForm = document.querySelector("#adminForm");
     const adminPassword = document.querySelector("#adminPassword");
+    const dragActionDialog = document.querySelector("#dragActionDialog");
+    const dragActionTitle = document.querySelector("#dragActionTitle");
+    const dragActionHelp = document.querySelector("#dragActionHelp");
+    const dragActionCancel = document.querySelector("#dragActionCancel");
+    const dragActionCopy = document.querySelector("#dragActionCopy");
+    const dragActionMove = document.querySelector("#dragActionMove");
     const modalTitle = document.querySelector("#modalTitle");
     const notice = document.querySelector("#notice");
 
@@ -5696,6 +6293,114 @@
       return { ok: true };
     }
 
+    function reservationKeyDetails(slotKey) {
+      const [dayId, rawSlot] = String(slotKey || "").split(":");
+      const slot = Number(rawSlot);
+      if (!days.some(day => day.id === dayId) || !slotStarts.includes(slot)) return null;
+      return { dayId, slot };
+    }
+
+    function reservationSlotLabel(slotKey) {
+      const details = reservationKeyDetails(slotKey);
+      return details ? `${dayLabel(details.dayId)} ${utcRange(details.slot)}` : slotKey;
+    }
+
+    async function moveReservation(sourceKey, targetKey) {
+      if (sourceKey === targetKey) return true;
+      const sourceReservation = data[sourceKey];
+      const targetDetails = reservationKeyDetails(targetKey);
+      if (!sourceReservation || !targetDetails) return false;
+
+      if (PREVIEW_SCHEDULE_MODE) {
+        data[targetKey] = { ...sourceReservation };
+        delete data[sourceKey];
+        reservationSourceKeys[targetKey] = [targetKey];
+        delete reservationSourceKeys[sourceKey];
+        delete reservationConflicts[sourceKey];
+        delete reservationConflictRecords[sourceKey];
+        delete reservationConflicts[targetKey];
+        delete reservationConflictRecords[targetKey];
+        save();
+        render();
+        return true;
+      }
+
+      if (!supabaseClient || !sharedReservationsReady) return false;
+      const sourceSourceKey = reservationSourceKeys[sourceKey]?.[0] || sourceKey;
+      const targetReservation = data[targetKey];
+
+      if (targetReservation) {
+        const targetSourceKey = reservationSourceKeys[targetKey]?.[0] || targetKey;
+        const { error: overwriteError } = await supabaseClient
+          .from(SUPABASE_TABLE)
+          .update(reservationToRecord(
+            targetSourceKey,
+            sourceReservation,
+            targetDetails.dayId,
+            targetDetails.slot
+          ))
+          .eq("slot_key", targetSourceKey);
+
+        if (overwriteError) {
+          await loadSharedReservations();
+          return false;
+        }
+
+        const { error: sourceDeleteError } = await supabaseClient
+          .from(SUPABASE_TABLE)
+          .delete()
+          .eq("slot_key", sourceSourceKey);
+
+        if (sourceDeleteError) {
+          await loadSharedReservations();
+          return false;
+        }
+      } else {
+        const { data: movedRows, error: moveError } = await supabaseClient
+          .from(SUPABASE_TABLE)
+          .update(reservationToRecord(
+            targetKey,
+            sourceReservation,
+            targetDetails.dayId,
+            targetDetails.slot
+          ))
+          .eq("slot_key", sourceSourceKey)
+          .select("slot_key");
+
+        if (moveError || !movedRows?.length) {
+          await loadSharedReservations();
+          return false;
+        }
+      }
+
+      await loadSharedReservations();
+      const movedReservation = data[targetKey];
+      return Boolean(movedReservation)
+        && !data[sourceKey]
+        && movedReservation.alliance === sourceReservation.alliance
+        && movedReservation.player === sourceReservation.player
+        && movedReservation.playerId === sourceReservation.playerId;
+    }
+
+    async function copyReservation(sourceKey, targetKey) {
+      if (sourceKey === targetKey) return true;
+      const sourceReservation = data[sourceKey];
+      if (!sourceReservation || !reservationKeyDetails(targetKey)) return false;
+
+      const result = await saveReservation(targetKey, {
+        alliance: sourceReservation.alliance || sourceReservation.kingdom || "",
+        player: sourceReservation.player || "",
+        playerId: sourceReservation.playerId || ""
+      });
+      if (!result.ok) return false;
+
+      const copiedReservation = data[targetKey];
+      return Boolean(data[sourceKey])
+        && Boolean(copiedReservation)
+        && copiedReservation.player === sourceReservation.player
+        && copiedReservation.playerId === sourceReservation.playerId;
+    }
+
     async function deleteReservation(slotKey) {
       if (PREVIEW_SCHEDULE_MODE) {
         delete data[slotKey];
@@ -5744,6 +6449,28 @@
       if (error) return false;
       await loadSharedReservations();
       return true;
+    }
+
+    async function clearAllReservations() {
+      if (PREVIEW_SCHEDULE_MODE) {
+        data = {};
+        reservationSourceKeys = {};
+        reservationConflicts = {};
+        reservationConflictRecords = {};
+        save();
+        render();
+        return true;
+      }
+      if (!supabaseClient || !sharedReservationsReady) return false;
+
+      const { error } = await supabaseClient
+        .from(SUPABASE_TABLE)
+        .delete()
+        .not("slot_key", "like", "schedule:%");
+
+      if (error) return false;
+      await loadSharedReservations();
+      return Object.keys(data).length === 0;
     }
 
     async function initializeSharedStorage({ force = false } = {}) {
@@ -5930,6 +6657,76 @@
       `;
     }
 
+    function renderAvailability() {
+      availabilityHeading.textContent = availabilityMessage("region");
+      previewResetBtn.hidden = !(PREVIEW_SCHEDULE_MODE && adminMode);
+      previewResetBtn.textContent = resetAllMessage("label");
+      availabilityStrip.setAttribute("aria-label", availabilityMessage("region"));
+      availabilityStrip.innerHTML = days.map(day => {
+        const availableSlots = slotStarts.filter(slot => !data[canonicalReservationKey(day.id, slot)]);
+        const dayReservations = slotStarts
+          .map(slot => data[canonicalReservationKey(day.id, slot)])
+          .filter(Boolean);
+        const allianceCounts = new Map();
+        dayReservations.forEach(reservation => {
+          const label = String(reservation.alliance || reservation.kingdom || "-").trim() || "-";
+          const normalized = label.toLocaleUpperCase();
+          const canonicalLabel = normalized === "DNB"
+            ? "DnB"
+            : (["KOR", "LOA", "SEC"].includes(normalized) ? normalized : label);
+          const current = allianceCounts.get(normalized) || { label: canonicalLabel, count: 0 };
+          current.count += 1;
+          allianceCounts.set(normalized, current);
+        });
+        const allianceStats = [...allianceCounts.values()].sort((a, b) =>
+          b.count - a.count || a.label.localeCompare(b.label)
+        );
+        const availableCount = availableSlots.length;
+        const isFull = availableCount === 0;
+        const showAllAvailableTimes = availableCount > 0 && availableCount <= 5;
+        const availablePercent = Math.round((availableCount / slotStarts.length) * 100);
+        const nextText = isFull
+          ? availabilityMessage("full")
+          : `${availabilityMessage("next")} · ${utcRange(availableSlots[0])}`;
+        const ariaLabel = availabilityMessage("aria", {
+          day: dayLabel(day.id),
+          count: availableCount
+        });
+
+        return `
+          <button
+            class="availability-card ${isFull ? "is-full" : ""}"
+            type="button"
+            data-availability-day="${day.id}"
+            aria-label="${escapeHtml(ariaLabel)}"
+            style="--availability-width: ${availablePercent}%"
+          >
+            <span class="availability-card-top">
+              <span class="availability-day">${escapeHtml(dayLabel(day.id))}</span>
+              <span class="availability-status">${escapeHtml(availabilityMessage(isFull ? "full" : "available"))}</span>
+            </span>
+            ${showAllAvailableTimes ? `
+              <span class="availability-times">
+                <span class="availability-detail-label">${escapeHtml(availabilityMessage("openTimes"))}</span>
+                <span class="availability-chip-list">
+                  ${availableSlots.map(slot => `<span class="availability-time-chip">${escapeHtml(utcRange(slot))}</span>`).join("")}
+                </span>
+              </span>
+            ` : `<span class="availability-next">${escapeHtml(nextText)}</span>`}
+            <span class="availability-alliances">
+              <span class="availability-detail-label">${escapeHtml(availabilityMessage("alliances"))}</span>
+              <span class="availability-chip-list">
+                ${allianceStats.length ? allianceStats.map(item => {
+                  const accessiblePeople = `${item.count} ${availabilityMessage("people")}`;
+                  return `<span class="availability-alliance-chip" aria-label="${escapeHtml(`${item.label} ${accessiblePeople}`)}"><strong>${escapeHtml(item.label)}</strong><span class="availability-person-icon" aria-hidden="true">&#x1F465;&#xFE0E;</span>${item.count}</span>`;
+                }).join("") : `<span class="availability-empty">${escapeHtml(availabilityMessage("none"))}</span>`}
+              </span>
+            </span>
+          </button>
+        `;
+      }).join("");
+    }
+
     function renderOffice() {
       if (!offices.some(office => office.id === activeOffice)) activeOffice = "mercantilism";
       officeSelect.innerHTML = offices.map(office => `
@@ -5943,7 +6740,7 @@
 
     function renderSlots() {
       slotList.innerHTML = days.map(day => `
-        <section class="day-column" aria-label="${dayLabel(day.id)}">
+        <section class="day-column" data-day-column="${day.id}" aria-label="${dayLabel(day.id)}">
           <div class="day-heading">
             <h3 class="day-title"><span class="day-title-label"><span>${dayLabel(day.id)}</span></span>
               <small>${escapeHtml(officeBuffText(officeForDay(day.id)))} · ${officeName(officeForDay(day.id))}</small>
@@ -5963,7 +6760,17 @@
               const conflictCount = reservationConflicts[slotKey] || 0;
               const reserved = Boolean(reservation);
               return `
-                <article class="slot ${reserved ? "reserved is-booked" : "is-open"} ${conflictCount ? "has-sync-conflict" : ""}">
+                <article
+                  class="slot ${reserved ? "reserved is-booked" : "is-open"} ${conflictCount ? "has-sync-conflict" : ""}"
+                  data-slot-card
+                  data-slot-key="${slotKey}"
+                  data-day="${day.id}"
+                  data-slot="${slot}"
+                  draggable="${reserved && adminMode ? "true" : "false"}"
+                  ${!reserved ? `role="button" tabindex="0" aria-label="${escapeHtml(`${dayLabel(day.id)} ${utcRange(slot)} ${t("available")} ${t("reserve")}`)}"` : `tabindex="-1"`}
+                  ${reserved && adminMode ? `aria-grabbed="false" title="${escapeHtml(slotInteractionMessage("dragHint"))}"` : ""}
+                >
+                  ${reserved && adminMode ? `<span class="slot-drag-hint admin-only" aria-hidden="true">↕ ${escapeHtml(slotInteractionMessage("dragHint"))}</span>` : ""}
                   <div class="slot-head">
                     <div class="time">${utcRange(slot)}</div>
                     <div class="timezone-stack">
@@ -6009,6 +6816,7 @@
       document.querySelector("#creditText").textContent = t("credit");
       document.querySelector("#creatorInvite").textContent = i18n[currentLang].creatorInvite || "Find me · Tap the heart";
       document.querySelector("#clearBtn").textContent = t("clear");
+      document.querySelector("#resetAllBtn").textContent = resetAllMessage("label");
       document.querySelector("#allianceLabel").textContent = t("alliance");
       document.querySelector("#nameLabel").textContent = t("name");
       document.querySelector("#idLabel").textContent = t("id");
@@ -6027,6 +6835,7 @@
     function render() {
       renderStaticText();
       renderOffice();
+      renderAvailability();
       renderSlots();
       document.body.classList.toggle("admin-mode", adminMode);
       document.querySelector("#adminBtn").textContent = adminMode ? t("adminOn") : t("admin");
@@ -6048,6 +6857,59 @@
       dialog.showModal();
     }
 
+    function clearReservationDragState() {
+      slotList.querySelectorAll(".is-dragging, .is-drop-target").forEach(card => {
+        card.classList.remove("is-dragging", "is-drop-target");
+        if (card.hasAttribute("aria-grabbed")) card.setAttribute("aria-grabbed", "false");
+      });
+      draggedReservationKey = null;
+    }
+
+    function chooseReservationDragAction(sourceKey, targetKey) {
+      dragActionTitle.textContent = slotInteractionMessage("actionTitle");
+      dragActionHelp.textContent = slotInteractionMessage("actionHelp", {
+        source: reservationSlotLabel(sourceKey),
+        target: reservationSlotLabel(targetKey)
+      });
+      dragActionCancel.textContent = slotInteractionMessage("cancel");
+      dragActionCopy.textContent = slotInteractionMessage("copy");
+      dragActionMove.textContent = slotInteractionMessage("move");
+      dragActionDialog.returnValue = "";
+      dragActionDialog.showModal();
+
+      return new Promise(resolve => {
+        dragActionDialog.addEventListener("close", () => {
+          resolve(["copy", "move"].includes(dragActionDialog.returnValue)
+            ? dragActionDialog.returnValue
+            : null);
+        }, { once: true });
+      });
+    }
+
+    async function handleReservationDrop(sourceKey, targetKey, action) {
+      if (!adminMode || !sourceKey || !targetKey || sourceKey === targetKey) return;
+      if (!["copy", "move"].includes(action)) return;
+      const targetReservation = data[targetKey];
+      if (targetReservation) {
+        const confirmed = confirm(slotInteractionMessage(
+          action === "copy" ? "occupiedCopyConfirm" : "occupiedConfirm",
+          {
+          target: reservationSlotLabel(targetKey),
+          player: targetReservation.player || targetReservation.alliance || "-"
+          }
+        ));
+        if (!confirmed) return;
+      }
+
+      const completed = action === "copy"
+        ? await copyReservation(sourceKey, targetKey)
+        : await moveReservation(sourceKey, targetKey);
+      if (!completed) render();
+      flash(slotInteractionMessage(completed
+        ? (action === "copy" ? "copied" : "moved")
+        : (action === "copy" ? "copyFailed" : "moveFailed")));
+    }
+
     langSelect.addEventListener("change", () => {
       if (!i18n[langSelect.value]) return;
       currentLang = langSelect.value;
@@ -6060,13 +6922,35 @@
       render();
     });
 
+    previewResetBtn.addEventListener("click", async () => {
+      if (!PREVIEW_SCHEDULE_MODE || !adminMode) return;
+      if (!confirm(resetAllMessage("confirm"))) return;
+      if (!confirm(resetAllMessage("confirmAgain"))) return;
+      const cleared = await clearAllReservations();
+      render();
+      flash(cleared ? resetAllMessage("done") : systemMessage("clearFailed"));
+    });
+
+    availabilityStrip.addEventListener("click", event => {
+      const summaryCard = event.target.closest("[data-availability-day]");
+      if (!summaryCard) return;
+      const dayColumn = slotList.querySelector(`[data-day-column="${summaryCard.dataset.availabilityDay}"]`);
+      dayColumn?.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
+    });
+
     slotList.addEventListener("click", async event => {
       const reserve = event.target.closest("[data-reserve]");
       const edit = event.target.closest("[data-edit]");
       const remove = event.target.closest("[data-delete]");
 
-      if (reserve) openReservation(reserve.dataset.day, reserve.dataset.reserve);
-      if (edit && adminMode) openReservation(edit.dataset.day, edit.dataset.edit);
+      if (reserve) {
+        openReservation(reserve.dataset.day, reserve.dataset.reserve);
+        return;
+      }
+      if (edit && adminMode) {
+        openReservation(edit.dataset.day, edit.dataset.edit);
+        return;
+      }
       if (remove) {
         if (!adminMode) return;
         activeDay = remove.dataset.day;
@@ -6074,8 +6958,71 @@
         const deleted = await deleteReservation(key());
         render();
         flash(deleted ? t("deleted") : systemMessage("deleteFailed"));
+        return;
+      }
+
+      const slotCard = event.target.closest(".slot.is-open[data-slot-card]");
+      if (!slotCard || event.target.closest("button, input, select, a")) return;
+      openReservation(slotCard.dataset.day, slotCard.dataset.slot);
+    });
+
+    slotList.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const slotCard = event.target.closest(".slot.is-open[data-slot-card]");
+      if (!slotCard || event.target.closest("button, input, select, a")) return;
+      event.preventDefault();
+      openReservation(slotCard.dataset.day, slotCard.dataset.slot);
+    });
+
+    slotList.addEventListener("dragstart", event => {
+      const slotCard = event.target.closest(".slot.is-booked[data-slot-key]");
+      if (!adminMode || !slotCard || !data[slotCard.dataset.slotKey]) {
+        event.preventDefault();
+        return;
+      }
+      draggedReservationKey = slotCard.dataset.slotKey;
+      slotCard.classList.add("is-dragging");
+      slotCard.setAttribute("aria-grabbed", "true");
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "copyMove";
+        event.dataTransfer.setData("text/plain", draggedReservationKey);
       }
     });
+
+    slotList.addEventListener("dragover", event => {
+      if (!adminMode || !draggedReservationKey) return;
+      const slotCard = event.target.closest(".slot[data-slot-key]");
+      if (!slotCard || slotCard.dataset.slotKey === draggedReservationKey) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+      slotList.querySelectorAll(".slot.is-drop-target").forEach(card => {
+        if (card !== slotCard) card.classList.remove("is-drop-target");
+      });
+      slotCard.classList.add("is-drop-target");
+    });
+
+    slotList.addEventListener("dragleave", event => {
+      const slotCard = event.target.closest(".slot.is-drop-target");
+      if (!slotCard || slotCard.contains(event.relatedTarget)) return;
+      slotCard.classList.remove("is-drop-target");
+    });
+
+    slotList.addEventListener("drop", async event => {
+      const slotCard = event.target.closest(".slot[data-slot-key]");
+      const sourceKey = draggedReservationKey || event.dataTransfer?.getData("text/plain");
+      if (!adminMode || !slotCard || !sourceKey || slotCard.dataset.slotKey === sourceKey) {
+        clearReservationDragState();
+        return;
+      }
+      event.preventDefault();
+      const targetKey = slotCard.dataset.slotKey;
+      clearReservationDragState();
+      const action = await chooseReservationDragAction(sourceKey, targetKey);
+      if (!action) return;
+      await handleReservationDrop(sourceKey, targetKey, action);
+    });
+
+    slotList.addEventListener("dragend", clearReservationDragState);
 
     slotList.addEventListener("change", async event => {
       const buffSelect = event.target.closest("[data-day-buff]");
@@ -6138,6 +7085,15 @@
       const cleared = await clearOfficeReservations();
       render();
       flash(cleared ? t("cleared") : systemMessage("clearFailed"));
+    });
+
+    document.querySelector("#resetAllBtn").addEventListener("click", async () => {
+      if (!adminMode) return;
+      if (!confirm(resetAllMessage("confirm"))) return;
+      if (!confirm(resetAllMessage("confirmAgain"))) return;
+      const cleared = await clearAllReservations();
+      render();
+      flash(cleared ? resetAllMessage("done") : systemMessage("clearFailed"));
     });
 
     document.querySelector("#adminBtn").addEventListener("click", () => {
