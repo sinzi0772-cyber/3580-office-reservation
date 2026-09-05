@@ -4820,6 +4820,12 @@
       line-height: 1.25;
     }
 
+    .availability-time-chip.is-overflow {
+      border-color: rgba(218, 181, 101, .34);
+      color: #e1bd70;
+      background: rgba(218, 181, 101, .08);
+    }
+
     .availability-alliance-chip strong {
       margin-right: 7px;
       color: #eee9df;
@@ -5535,9 +5541,9 @@
 
     const resetAllText = {
       ko: {
-        label: "모든 예약 초기화",
-        confirm: "모든 요일의 예약자 정보를 삭제할까요? 이 작업은 되돌릴 수 없습니다. 요일별 버프 설정은 유지됩니다.",
-        confirmAgain: "마지막 확인입니다. 정말 모든 예약을 삭제할까요?",
+        label: "전체 일정 초기화",
+        confirm: "월·화·목·금의 모든 예약자 정보를 초기화할까요? 이 작업은 되돌릴 수 없습니다. 요일별 버프 설정은 유지됩니다.",
+        confirmAgain: "최종 경고입니다. 정말 전체 일정을 초기화할까요? 모든 예약자 정보가 삭제됩니다.",
         done: "모든 예약이 초기화되었습니다."
       },
       en: {
@@ -6888,11 +6894,9 @@
         );
         const availableCount = availableSlots.length;
         const isFull = availableCount === 0;
-        const showAllAvailableTimes = availableCount > 0 && availableCount <= 5;
+        const visibleAvailableSlots = availableSlots.slice(0, 5);
+        const hiddenAvailableCount = Math.max(0, availableCount - visibleAvailableSlots.length);
         const availablePercent = Math.round((availableCount / slotStarts.length) * 100);
-        const nextText = isFull
-          ? availabilityMessage("full")
-          : `${availabilityMessage("next")} · ${utcRange(availableSlots[0])}`;
         const ariaLabel = availabilityMessage("aria", {
           day: dayLabel(day.id),
           count: availableCount
@@ -6910,14 +6914,15 @@
               <span class="availability-day">${escapeHtml(dayLabel(day.id))}</span>
               <span class="availability-status">${escapeHtml(availabilityMessage(isFull ? "full" : "available"))}</span>
             </span>
-            ${showAllAvailableTimes ? `
+            ${!isFull ? `
               <span class="availability-times">
                 <span class="availability-detail-label">${escapeHtml(availabilityMessage("openTimes"))}</span>
                 <span class="availability-chip-list">
-                  ${availableSlots.map(slot => `<span class="availability-time-chip">${escapeHtml(utcRange(slot))}</span>`).join("")}
+                  ${visibleAvailableSlots.map(slot => `<span class="availability-time-chip">${escapeHtml(utcRange(slot))}</span>`).join("")}
+                  ${hiddenAvailableCount > 0 ? `<span class="availability-time-chip is-overflow" aria-label="${escapeHtml(`+${hiddenAvailableCount}`)}">+${hiddenAvailableCount}</span>` : ""}
                 </span>
               </span>
-            ` : `<span class="availability-next">${escapeHtml(nextText)}</span>`}
+            ` : `<span class="availability-next">${escapeHtml(availabilityMessage("full"))}</span>`}
             <span class="availability-alliances">
               <span class="availability-detail-label">${escapeHtml(availabilityMessage("alliances"))}</span>
               <span class="availability-chip-list">
