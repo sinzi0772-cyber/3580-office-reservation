@@ -6734,10 +6734,13 @@
       const startOffset = offset(start);
       const endOffset = offset(end);
       const zoneLabel = [region.abbreviation, startOffset === endOffset ? startOffset : `${startOffset} → ${endOffset}`].filter(Boolean).join(" · ");
+      const abbreviation = region.abbreviation || Object.values(reservationTimeZones).find(item => item.zone === region.zone)?.abbreviation;
+      const displayZone = startOffset === endOffset ? (abbreviation || startOffset) : `${startOffset} → ${endOffset}`;
       const endDay = calendar.format(start) === calendar.format(end) ? "" : `${day.format(end)} `;
       return {
         label: `${region.label} · ${zoneLabel}`,
         range: `${day.format(start)} ${clock.format(start)}–${endDay}${clock.format(end)}`,
+        displayZone,
         zone: region.zone
       };
     }
@@ -7182,9 +7185,16 @@
         pendingQuickReservation = { dayId, slot: firstAvailableSlot };
         document.querySelector("#quickReserveTitle").textContent = `${dayLabel(dayId)} · ${t("reserve")}`;
         document.querySelector("#quickReserveMessage").textContent = systemMessage("quickReserve").replace("{day}", dayLabel(dayId));
-        document.querySelector("#quickReserveTime").textContent = utcRange(firstAvailableSlot);
-        const localTime = quickReservationLocalTime(dayId, firstAvailableSlot);
-        document.querySelector("#quickReserveLocalTime").textContent = localTime.range;
+        document.querySelector("#quickReserveTime").textContent = `${dayLabel(dayId)} ${formatMinutes(firstAvailableSlot)}–${formatMinutes(firstAvailableSlot + 30)} UTC`;
+        const localTimeElement = document.querySelector("#quickReserveLocalTime");
+        if (currentLang === "ko") {
+          const localTime = quickReservationLocalTime(dayId, firstAvailableSlot, "ko");
+          localTimeElement.textContent = `${localTime.range} ${localTime.displayZone}`;
+          localTimeElement.hidden = false;
+        } else {
+          localTimeElement.textContent = "";
+          localTimeElement.hidden = true;
+        }
         document.querySelector("#quickReserveCancel").textContent = t("cancel");
         document.querySelector("#quickReserveConfirm").textContent = systemMessage("acknowledge");
         quickReserveDialog.returnValue = "";
