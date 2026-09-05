@@ -4966,6 +4966,30 @@
       color: #d2b67e;
     }
 
+    .quick-reserve-times {
+      display: grid;
+      gap: 8px;
+      margin: 20px 0;
+      padding: 16px;
+      border: 1px solid #393327;
+      border-radius: 8px;
+      background: #0b0c0d;
+    }
+
+    #quickReserveTime {
+      color: #bdb4a7;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #quickReserveLocalTime {
+      color: #f2ede3;
+      font-size: 19px;
+      line-height: 1.5;
+      font-variant-numeric: tabular-nums;
+    }
+
     /* Local schedule-import preview: day/date pairing from the supplied sheet. */
     .day-title-label {
       display: inline-flex;
@@ -5137,6 +5161,31 @@
         <button class="cancel" value="cancel" type="submit" id="dragActionCancel">Cancel</button>
         <button class="tool-btn" value="copy" type="submit" id="dragActionCopy">Copy</button>
         <button class="reserve" value="move" type="submit" id="dragActionMove">Move</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dayFullDialog" aria-labelledby="dayFullTitle" aria-describedby="dayFullMessage">
+    <form class="modal" method="dialog">
+      <h2 id="dayFullTitle">Fully booked</h2>
+      <p id="dayFullMessage"></p>
+      <div class="modal-actions">
+        <button class="reserve" type="submit" id="dayFullClose" autofocus>OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="quickReserveDialog" aria-labelledby="quickReserveTitle" aria-describedby="quickReserveMessage quickReserveTime quickReserveLocalTime">
+    <form class="modal" method="dialog">
+      <h2 id="quickReserveTitle">Reserve</h2>
+      <p id="quickReserveMessage"></p>
+      <div class="quick-reserve-times">
+        <strong id="quickReserveTime"></strong>
+        <strong id="quickReserveLocalTime"></strong>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel" value="cancel" type="submit" id="quickReserveCancel">Cancel</button>
+        <button class="reserve" value="continue" type="submit" id="quickReserveConfirm" autofocus>OK</button>
       </div>
     </form>
   </dialog>
@@ -5818,12 +5867,18 @@
     const dragActionCancel = document.querySelector("#dragActionCancel");
     const dragActionCopy = document.querySelector("#dragActionCopy");
     const dragActionMove = document.querySelector("#dragActionMove");
+    const dayFullDialog = document.querySelector("#dayFullDialog");
+    const quickReserveDialog = document.querySelector("#quickReserveDialog");
+    let pendingQuickReservation = null;
     const modalTitle = document.querySelector("#modalTitle");
     const notice = document.querySelector("#notice");
 
     const systemMessages = {
       ko: {
         offline: "공유 저장소에 연결되지 않았습니다. 잠시 후 다시 시도해 주세요.",
+        dayFull: "해당 요일의 예약이 모두 마감되었습니다. 다른 요일을 선택해 주세요.",
+        quickReserve: "선택하신 {day}의 가장 빠른 시간으로 예약을 도와드릴까요?",
+        acknowledge: "확인",
         saveFailed: "공유 저장에 실패했습니다. 예약은 완료되지 않았습니다.",
         slotTaken: "방금 다른 사용자가 이 시간을 예약했습니다. 일정을 새로 불러왔습니다.",
         scheduleSetup: "공통 일정 설정이 아직 준비되지 않았습니다.",
@@ -5835,6 +5890,9 @@
       },
       en: {
         offline: "Shared storage is not connected. Please try again shortly.",
+        dayFull: "All time slots for this day are fully booked. Please choose another day.",
+        quickReserve: "Would you like to book the earliest available time on {day}?",
+        acknowledge: "OK",
         saveFailed: "Shared save failed. The reservation was not completed.",
         slotTaken: "Another user just reserved this time. The schedule has been refreshed.",
         scheduleSetup: "Shared schedule settings have not been set up yet.",
@@ -5846,6 +5904,9 @@
       },
       ja: {
         offline: "共有ストレージに接続されていません。しばらくしてから再試行してください。",
+        dayFull: "この曜日はすべての時間帯が予約済みです。別の曜日を選んでください。",
+        quickReserve: "選択した{day}の最も早い空き時間で予約を進めますか？",
+        acknowledge: "確認",
         saveFailed: "共有保存に失敗しました。予約は完了していません。",
         slotTaken: "別のユーザーがこの時間を予約しました。日程を更新しました。",
         scheduleSetup: "共有日程設定がまだ準備されていません。",
@@ -5857,6 +5918,9 @@
       },
       "zh-Hans": {
         offline: "未连接共享存储，请稍后重试。",
+        dayFull: "该日的所有时段均已约满，请选择其他日期。",
+        quickReserve: "是否为您预约所选{day}最早的可用时段？",
+        acknowledge: "确定",
         saveFailed: "共享保存失败，预约尚未完成。",
         slotTaken: "其他用户刚刚预约了该时段，日程已刷新。",
         scheduleSetup: "共享日程设置尚未准备完成。",
@@ -5868,6 +5932,9 @@
       },
       "zh-Hant": {
         offline: "尚未連接共享儲存空間，請稍後再試。",
+        dayFull: "該日的所有時段均已預約額滿，請選擇其他日期。",
+        quickReserve: "是否為您預約所選{day}最早的可用時段？",
+        acknowledge: "確定",
         saveFailed: "共享儲存失敗，預約尚未完成。",
         slotTaken: "其他使用者剛剛預約了此時段，日程已重新整理。",
         scheduleSetup: "共享日程設定尚未準備完成。",
@@ -5879,6 +5946,9 @@
       },
       es: {
         offline: "El almacenamiento compartido no está conectado. Inténtalo de nuevo en breve.",
+        dayFull: "Todos los horarios de este día están reservados. Elige otro día.",
+        quickReserve: "¿Quieres reservar el primer horario disponible del {day}?",
+        acknowledge: "Aceptar",
         saveFailed: "No se pudo guardar en común. La reserva no se completó.",
         slotTaken: "Otro usuario acaba de reservar este horario. El calendario se actualizó.",
         scheduleSetup: "La configuración del calendario compartido aún no está preparada.",
@@ -5890,6 +5960,9 @@
       },
       pt: {
         offline: "O armazenamento compartilhado não está conectado. Tente novamente em instantes.",
+        dayFull: "Todos os horários deste dia estão reservados. Escolha outro dia.",
+        quickReserve: "Deseja reservar o primeiro horário disponível de {day}?",
+        acknowledge: "OK",
         saveFailed: "Falha ao salvar no compartilhamento. A reserva não foi concluída.",
         slotTaken: "Outro usuário acabou de reservar este horário. A agenda foi atualizada.",
         scheduleSetup: "As configurações da agenda compartilhada ainda não foram preparadas.",
@@ -5901,6 +5974,9 @@
       },
       fr: {
         offline: "Le stockage partagé n’est pas connecté. Réessayez dans un instant.",
+        dayFull: "Tous les créneaux de ce jour sont réservés. Veuillez choisir un autre jour.",
+        quickReserve: "Souhaitez-vous réserver le premier créneau disponible pour {day} ?",
+        acknowledge: "OK",
         saveFailed: "Échec de l’enregistrement partagé. La réservation n’est pas terminée.",
         slotTaken: "Un autre utilisateur vient de réserver ce créneau. Le planning a été actualisé.",
         scheduleSetup: "Les paramètres du planning partagé ne sont pas encore prêts.",
@@ -5912,6 +5988,9 @@
       },
       de: {
         offline: "Der gemeinsame Speicher ist nicht verbunden. Bitte gleich erneut versuchen.",
+        dayFull: "Alle Termine an diesem Tag sind ausgebucht. Bitte wähle einen anderen Tag.",
+        quickReserve: "Möchtest du den frühesten verfügbaren Termin für {day} buchen?",
+        acknowledge: "OK",
         saveFailed: "Gemeinsames Speichern fehlgeschlagen. Die Reservierung wurde nicht abgeschlossen.",
         slotTaken: "Ein anderer Benutzer hat diesen Termin gerade reserviert. Der Plan wurde aktualisiert.",
         scheduleSetup: "Die gemeinsamen Termineinstellungen sind noch nicht eingerichtet.",
@@ -5923,6 +6002,9 @@
       },
       tr: {
         offline: "Paylaşılan depolamaya bağlı değil. Lütfen kısa süre sonra yeniden deneyin.",
+        dayFull: "Bu günün tüm saatleri dolu. Lütfen başka bir gün seçin.",
+        quickReserve: "{day} için uygun olan en erken saate rezervasyon yapmak ister misiniz?",
+        acknowledge: "Tamam",
         saveFailed: "Paylaşılan kayıt başarısız oldu. Rezervasyon tamamlanmadı.",
         slotTaken: "Bu saati başka bir kullanıcı az önce ayırttı. Program yenilendi.",
         scheduleSetup: "Paylaşılan program ayarları henüz hazırlanmadı.",
@@ -6614,6 +6696,52 @@
       return `UTC ${formatMinutes(slot)}-${formatMinutes(slot + 30)}`;
     }
 
+    // Named regional defaults are display-only; reservation keys always stay in UTC.
+    const reservationTimeZones = {
+      ko: { zone: "Asia/Seoul", label: "한국 시간", abbreviation: "KST" },
+      ja: { zone: "Asia/Tokyo", label: "日本時間", abbreviation: "JST" },
+      "zh-Hans": { zone: "Asia/Shanghai", label: "中国时间", abbreviation: "CST" },
+      "zh-Hant": { zone: "Asia/Taipei", label: "台灣時間", abbreviation: "CST" },
+      es: { zone: "Europe/Madrid", label: "Hora de España (Madrid)" },
+      pt: { zone: "America/Sao_Paulo", label: "Horário de Brasília" },
+      fr: { zone: "Europe/Paris", label: "Heure de France (Paris)" },
+      de: { zone: "Europe/Berlin", label: "Deutsche Zeit (Berlin)" },
+      tr: { zone: "Europe/Istanbul", label: "Türkiye saati", abbreviation: "TRT" }
+    };
+
+    function quickReservationLocalTime(dayId, slot, lang = currentLang, now = new Date(), deviceZone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
+      const region = reservationTimeZones[lang] || {
+        zone: deviceZone || "UTC",
+        label: `Your local time · ${deviceZone || "UTC"}`
+      };
+      const weekday = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 }[dayId];
+      const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      start.setUTCDate(start.getUTCDate() + (weekday - start.getUTCDay() + 7) % 7);
+      start.setUTCMinutes(slot);
+      // The board is weekly: use the next occurrence to apply that date's daylight-saving offset.
+      if (start < now) start.setUTCDate(start.getUTCDate() + 7);
+      const end = new Date(start.getTime() + 30 * 60 * 1000);
+      const clock = new Intl.DateTimeFormat(lang, {
+        timeZone: region.zone, hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      });
+      const day = new Intl.DateTimeFormat(lang, { timeZone: region.zone, weekday: "long" });
+      const calendar = new Intl.DateTimeFormat("en-CA", {
+        timeZone: region.zone, year: "numeric", month: "2-digit", day: "2-digit"
+      });
+      const offset = date => new Intl.DateTimeFormat("en", {
+        timeZone: region.zone, timeZoneName: "shortOffset"
+      }).formatToParts(date).find(part => part.type === "timeZoneName").value.replace("GMT", "UTC");
+      const startOffset = offset(start);
+      const endOffset = offset(end);
+      const zoneLabel = [region.abbreviation, startOffset === endOffset ? startOffset : `${startOffset} → ${endOffset}`].filter(Boolean).join(" · ");
+      const endDay = calendar.format(start) === calendar.format(end) ? "" : `${day.format(end)} `;
+      return {
+        label: `${region.label} · ${zoneLabel}`,
+        range: `${day.format(start)} ${clock.format(start)}–${endDay}${clock.format(end)}`,
+        zone: region.zone
+      };
+    }
+
     function kstRange(slot) {
       const start = (slot + 540) % 1440;
       const endRaw = slot + 570;
@@ -7044,11 +7172,46 @@
       flash(cleared ? resetAllMessage("done") : systemMessage("clearFailed"));
     });
 
+    function showQuickReservation(dayId) {
+      if (!sharedReservationsReady) {
+        flash(systemMessage("offline"));
+        return;
+      }
+      const firstAvailableSlot = slotStarts.find(slot => !data[canonicalReservationKey(dayId, slot)]);
+      if (firstAvailableSlot !== undefined) {
+        pendingQuickReservation = { dayId, slot: firstAvailableSlot };
+        document.querySelector("#quickReserveTitle").textContent = `${dayLabel(dayId)} · ${t("reserve")}`;
+        document.querySelector("#quickReserveMessage").textContent = systemMessage("quickReserve").replace("{day}", dayLabel(dayId));
+        document.querySelector("#quickReserveTime").textContent = utcRange(firstAvailableSlot);
+        const localTime = quickReservationLocalTime(dayId, firstAvailableSlot);
+        document.querySelector("#quickReserveLocalTime").textContent = localTime.range;
+        document.querySelector("#quickReserveCancel").textContent = t("cancel");
+        document.querySelector("#quickReserveConfirm").textContent = systemMessage("acknowledge");
+        quickReserveDialog.returnValue = "";
+        quickReserveDialog.showModal();
+        return;
+      }
+      document.querySelector("#dayFullTitle").textContent = `${dayLabel(dayId)} · ${availabilityMessage("full")}`;
+      document.querySelector("#dayFullMessage").textContent = systemMessage("dayFull");
+      document.querySelector("#dayFullClose").textContent = systemMessage("acknowledge");
+      dayFullDialog.showModal();
+    }
+
     availabilityStrip.addEventListener("click", event => {
       const summaryCard = event.target.closest("[data-availability-day]");
-      if (!summaryCard) return;
-      const dayColumn = slotList.querySelector(`[data-day-column="${summaryCard.dataset.availabilityDay}"]`);
-      dayColumn?.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" });
+      if (summaryCard) showQuickReservation(summaryCard.dataset.availabilityDay);
+    });
+
+    quickReserveDialog.addEventListener("close", () => {
+      const selection = pendingQuickReservation;
+      pendingQuickReservation = null;
+      if (quickReserveDialog.returnValue !== "continue" || !selection) return;
+      const firstAvailableSlot = slotStarts.find(slot => !data[canonicalReservationKey(selection.dayId, slot)]);
+      if (firstAvailableSlot !== selection.slot) {
+        showQuickReservation(selection.dayId);
+        return;
+      }
+      openReservation(selection.dayId, selection.slot);
     });
 
     slotList.addEventListener("click", async event => {
